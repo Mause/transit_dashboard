@@ -2,6 +2,7 @@ import requests
 from datetime import datetime
 from dateutil.parser import parse
 from dateutil.tz import gettz
+from pprint import pprint
 
 perth = gettz("Australia/Perth")
 
@@ -9,48 +10,64 @@ session = requests.Session()
 session.params.update(
     {"format": "json", "ApiKey": "ad89905f-d5a7-487f-a876-db39092c6ee0"}
 )
-r = session.get(
-    "https://realtime.transperth.info/SJP/StopTimetableService.svc/DataSets/PerthRestricted/StopTimetable",
-    params={
-        "StopUID": "PerthRestricted:11706",
-        "IsRealTimeChecked": "true",
-        "ReturnNotes": "true",
-        "Time": datetime.now().isoformat(),
-    },
-)
 
-print(r)
-from pprint import pprint
 
-data = r.json()
+def trips_for_stop(stop_uid: str, time: datetime):
+    r = session.get(
+        "https://realtime.transperth.info/SJP/StopTimetableService.svc/DataSets/PerthRestricted/StopTimetable",
+        params={
+            "StopUID": "PerthRestricted:11706",
+            "IsRealTimeChecked": "true",
+            "ReturnNotes": "true",
+            "Time": time.isoformat(),
+        },
+    )
 
-server_time = parse(r.headers["Date"]).astimezone(perth)
-print(server_time)
+    data = r.json()
 
-trips = [trip for trip in data["Trips"] if trip["Summary"]["RouteCode"] == "101"]
+    server_time = parse(r.headers["Date"]).astimezone(perth)
 
-pprint(trips[0])
+    return (server_time, data["Trips"])
 
-trip = trips[0]
 
-depart_time = parse(trip['DepartTime']).astimezone(perth)
-estimated_depart_time = parse(trip['RealTimeInfo']['EstimatedArrivalTime']).astimezone(perth)
+def main():
+    server_time, trips = trips_for_stop("11706", datetime.now())
 
-print(depart_time)
-print(estimated_depart_time)
+    trips = [trip for trip in trips if trip["Summary"]["RouteCode"] == "101"]
+    print('current_time:', datetime.now())
+    print('server_time:', server_time)
 
-delta = (estimated_depart_time - depart_time)
+#    pprint(trips[0])
 
-cm = delta.total_seconds()
+    trip = trips[0]
 
-till = estimated_depart_time - server_time
+    analyse_trip(server_time, trip)
 
-print(f'arriving in {till}')
 
-if cm > 0:
-    print(f'running {delta} late')
-elif cm < 0:
-    print(f'running {delta} early')
-else:
-    print('running on time')
+def analyse_trip(server_time, trip):
+    depart_time = parse(trip["DepartTime"]).astimezone(perth)
+    estimated_depart_time = parse(
+        trip["RealTimeInfo"]["EstimatedArrivalTime"]
+    ).astimezone(perth)
 
+    print(depart_time)
+    print(estimated_depart_time)
+
+    delta = estimated_depart_time - depart_time
+
+    cm = delta.total_seconds()
+
+    till = estimated_depart_time - server_time
+
+    print(f"arriving in {till}")
+
+    if cm > 0:
+        print(f"running {delta} late")
+    elif cm < 0:
+        print(f"running {delta} early")
+    else:
+        print("running on time")
+
+
+if __name__ == "__main__":
+    main()
