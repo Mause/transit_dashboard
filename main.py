@@ -2,6 +2,7 @@ import requests
 from datetime import datetime
 from dateutil.parser import parse
 from dateutil.tz import gettz
+from humanize import naturaltime
 from pprint import pprint
 
 perth = gettz("Australia/Perth")
@@ -59,7 +60,7 @@ def analyse_trip(server_time, trip):
 
     till = estimated_depart_time - server_time
 
-    print(f"arriving in {till}")
+    print(f"arriving in {naturaltime(-till)}")
 
     if cm > 0:
         print(f"running {delta} late")
