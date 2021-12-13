@@ -1,6 +1,6 @@
 import requests
 from datetime import datetime
-from dateutil.parser import parse
+from dateutil.parser import parse as _parse
 from dateutil.tz import gettz
 from humanize import naturaltime
 from pprint import pprint
@@ -11,6 +11,10 @@ session = requests.Session()
 session.params.update(
     {"format": "json", "ApiKey": "ad89905f-d5a7-487f-a876-db39092c6ee0"}
 )
+
+
+def parse(string: str) -> datetime:
+    return _parse(string, tzinfos={None: perth})
 
 
 def trips_for_stop(stop_uid: str, time: datetime):
@@ -26,7 +30,7 @@ def trips_for_stop(stop_uid: str, time: datetime):
 
     data = r.json()
 
-    server_time = parse(r.headers["Date"]).astimezone(perth)
+    server_time = parse(r.headers["Date"])
 
     return (server_time, data["Trips"])
 
@@ -35,7 +39,7 @@ def main():
     server_time, trips = trips_for_stop("11706", datetime.now(tz=perth))
 
     trips = [trip for trip in trips if trip["Summary"]["RouteCode"] == "101"]
-    print("current_time:", datetime.now())
+    print("current_time:", datetime.now(tz=perth))
     print("server_time:", server_time)
 
     pprint(trips[0])
@@ -46,22 +50,20 @@ def main():
 
 
 def analyse_trip(server_time, trip):
-    depart_time = parse(trip["DepartTime"]).astimezone(perth)
+    depart_time = parse(trip["DepartTime"])
     estimated_depart_time = parse(
         trip["RealTimeInfo"].get("EstimatedArrivalTime")
         or trip["RealTimeInfo"]["ActualArrivalTime"]
-    ).astimezone(perth)
+    )
 
-    print(depart_time)
-    print(estimated_depart_time)
+    print(f"{depart_time=}")
+    print(f"{estimated_depart_time=}")
 
     delta = estimated_depart_time - depart_time
 
     cm = delta.total_seconds()
 
-    till = estimated_depart_time - server_time
-
-    print(f"arriving in {naturaltime(-till)}")
+    print("arriving in " + naturaltime(estimated_depart_time, when=server_time))
 
     if cm > 0:
         print(f"running {delta} late")
