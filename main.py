@@ -38,7 +38,7 @@ def main():
     print('current_time:', datetime.now())
     print('server_time:', server_time)
 
-#    pprint(trips[0])
+    pprint(trips[0])
 
     trip = trips[0]
 
