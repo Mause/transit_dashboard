@@ -48,7 +48,7 @@ def main():
 def analyse_trip(server_time, trip):
     depart_time = parse(trip["DepartTime"]).astimezone(perth)
     estimated_depart_time = parse(
-        trip["RealTimeInfo"].get("EstimatedArrivalTime") ||
+        trip["RealTimeInfo"].get("EstimatedArrivalTime") or
         trip["RealTimeInfo"]["ActualArrivalTime"]
     ).astimezone(perth)
 
