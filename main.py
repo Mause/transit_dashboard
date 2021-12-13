@@ -35,10 +35,10 @@ def main():
     server_time, trips = trips_for_stop("11706", datetime.now())
 
     trips = [trip for trip in trips if trip["Summary"]["RouteCode"] == "101"]
-    print('current_time:', datetime.now())
-    print('server_time:', server_time)
+    print("current_time:", datetime.now())
+    print("server_time:", server_time)
 
-#    pprint(trips[0])
+    pprint(trips[0])
 
     trip = trips[0]
 
@@ -48,7 +48,8 @@ def main():
 def analyse_trip(server_time, trip):
     depart_time = parse(trip["DepartTime"]).astimezone(perth)
     estimated_depart_time = parse(
-        trip["RealTimeInfo"]["EstimatedArrivalTime"]
+        trip["RealTimeInfo"].get("EstimatedArrivalTime")
+        or trip["RealTimeInfo"]["ActualArrivalTime"]
     ).astimezone(perth)
 
     print(depart_time)
