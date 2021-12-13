@@ -11,4 +11,4 @@ jobs:
       - run: |
           pip install pipenv
           pipenv install
-          pipenv run python main.py
+      - run: pipenv run python main.py
