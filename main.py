@@ -32,7 +32,7 @@ def trips_for_stop(stop_uid: str, time: datetime):
 
 
 def main():
-    server_time, trips = trips_for_stop("11706", datetime.now())
+    server_time, trips = trips_for_stop("11706", datetime.now(tz=perth))
 
     trips = [trip for trip in trips if trip["Summary"]["RouteCode"] == "101"]
     print("current_time:", datetime.now())
