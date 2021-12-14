@@ -50,7 +50,7 @@ def main():
 
 
 def analyse_trip(server_time, trip):
-    if 'RealTimeInfo' not in trip:
+    if "RealTimeInfo" not in trip:
         return
 
     depart_time = parse(trip["DepartTime"])
