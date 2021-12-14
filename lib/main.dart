@@ -26,10 +26,10 @@ void main() async {
       },
     ));
     var body = jsonDecode(r.body);
-    print(body);
-    var trips = Response.fromJson(body).trips;
+    var res = Response.fromJson(body);
+    print(jsonEncode(res));
     var routes = [];
-    for (var trip in trips) {
+    for (var trip in res.trips) {
       if (!routes.contains(trip.summary.routeCode)) {
         routes.add(trip.summary.routeCode);
       }
