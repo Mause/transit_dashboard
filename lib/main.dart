@@ -14,32 +14,36 @@ void main() async {
   var perth = tz.getLocation('Australia/Perth');
 
   try {
-    var r = await client.get(Uri.https(
-      "realtime.transperth.info",
-      "/SJP/StopTimetableService.svc/DataSets/PerthRestricted/StopTimetable",
-      {
-        "StopUID": "PerthRestricted:11706",
-        "IsRealTimeChecked": "true",
-        "ReturnNotes": "true",
-        "Time": tz.TZDateTime.now(perth).toIso8601String(),
-        "format": "json",
-        "ApiKey": "ad89905f-d5a7-487f-a876-db39092c6ee0"
-      },
-    ));
-    var body = jsonDecode(r.body);
-    var res = Response.fromJson(body);
-    print(json.convert(res));
-    var routes = [];
-    for (var trip in res.trips) {
-      if (!routes.contains(trip.summary.routeCode)) {
-        routes.add(trip.summary.routeCode);
-      }
-    }
-    // print(jsonEncode(trips.toList()));
-    print(routes);
+    await getTripsForStop("11706");
   } finally {
     client.close();
   }
+}
+
+void getTripsForStop(String stop) {
+  var r = await client.get(Uri.https(
+    "realtime.transperth.info",
+    "/SJP/StopTimetableService.svc/DataSets/PerthRestricted/StopTimetable",
+    {
+      "StopUID": "PerthRestricted:$stopNumber",
+      "IsRealTimeChecked": "true",
+      "ReturnNotes": "true",
+      "Time": tz.TZDateTime.now(perth).toIso8601String(),
+      "format": "json",
+      "ApiKey": "ad89905f-d5a7-487f-a876-db39092c6ee0"
+    },
+  ));
+  var body = jsonDecode(r.body);
+  var res = Response.fromJson(body);
+  print(json.convert(res));
+  var routes = [];
+  for (var trip in res.trips) {
+    if (!routes.contains(trip.summary.routeCode)) {
+      routes.add(trip.summary.routeCode);
+    }
+  }
+  // print(jsonEncode(trips.toList()));
+  print(routes);
 }
 
 @JsonSerializable()
