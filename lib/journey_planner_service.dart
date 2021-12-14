@@ -9,14 +9,13 @@ var client = SentryHttpClient(captureFailedRequests: true);
 
 List<NearbyTransitStop> nearbyStops(String apikey, Location location) async {
   var res = await client.get(Uri.http(
-    "au-journeyplanner.silverrailtech.com",
-    "journeyplannerservice/v2/REST/Datasets/PerthRestricted/NearbyTransitStops",
-    {
-      "ApiKey": apikey,
-      "format": "json",
-      "GeoCoordinate": "${location.latitude},${location.longitude}"
-    }
-  ));
+      "au-journeyplanner.silverrailtech.com",
+      "journeyplannerservice/v2/REST/Datasets/PerthRestricted/NearbyTransitStops",
+      {
+        "ApiKey": apikey,
+        "format": "json",
+        "GeoCoordinate": "${location.latitude},${location.longitude}"
+      }));
 
   return Response.fromJson(jsonDecode(res.body)).transitStopPaths;
 }
