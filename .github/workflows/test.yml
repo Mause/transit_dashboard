@@ -12,3 +12,24 @@ jobs:
           pip install pipenv
           pipenv install
       - run: pipenv run python main.py
+
+  dart:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: dart-lang/setup-dart@v1
+
+      - name: Install dependencies
+        run: dart pub get
+
+      - name: Generate sources
+        run: dart run build_runner build --verbose
+
+      - name: Verify formatting
+        run: dart format --output=none --set-exit-if-changed .
+
+      - name: Analyze project source
+        run: dart analyze
+
+      - run: dart lib/main.dart
