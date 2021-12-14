@@ -54,10 +54,10 @@ class Response {
 
   Response(this.transitStopPaths);
 
-  factory RealTimeInfo.fromJson(Map<String, dynamic> json) =>
-      _$RealTimeInfoFromJson(json);
+  factory Response.fromJson(Map<String, dynamic> json) =>
+      _$ResponseFromJson(json);
 
-  Map<String, dynamic> toJson() => _$RealTimeInfoToJson(this);
+  Map<String, dynamic> toJson() => _$ResponseToJson(this);
 }
 
 class Location {
