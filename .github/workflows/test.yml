@@ -26,4 +26,10 @@ jobs:
       - name: Generate sources
         run: dart run build_runner build --verbose
 
+      - name: Verify formatting
+        run: dart format --output=none --set-exit-if-changed .
+
+      - name: Analyze project source
+        run: dart analyze
+
       - run: dart lib/main.dart
