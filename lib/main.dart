@@ -1,5 +1,6 @@
 import 'package:sentry/sentry.dart';
 import 'dart:core';
+import 'dart:async';
 import 'package:json_annotation/json_annotation.dart';
 import 'dart:convert';
 import 'package:timezone/standalone.dart' as tz;
@@ -12,14 +13,28 @@ var json = JsonEncoder.withIndent('  ');
 void main() async {
   await tz.initializeTimeZone();
 
-  try {
-    await getTripsForStop("11706");
-  } finally {
-    client.close();
-  }
+  var location = Location(-31, 115);
+
+  var stops = await nearbyStops("", location);
+
+  var nearbyBuses = (
+    await Future.wait(
+      stops.map((stop) => getStopTimetable(stop.transitStop.code))
+    )
+  ).flatMap().toSet();
+
+  var nearbyBus = nearbyBuses[0];
+
+  createNotification(
+    nearbyBus.requestedStop.description,
+    nearbyBus.route.code,
+    DateTime.now() - nearbyBus.realTimeInfo.estimatedArrivalTime
+  );
 }
 
-Future<List<String>> getTripsForStop(String stopNumber) async {
+void createNotification(String description, String routeCode, Delta delta) {}
+
+Future<Response> getStopTimetable(String stopNumber) {
   var perth = tz.getLocation('Australia/Perth');
 
   var r = await client.get(Uri.https(
@@ -34,17 +49,16 @@ Future<List<String>> getTripsForStop(String stopNumber) async {
       "ApiKey": "ad89905f-d5a7-487f-a876-db39092c6ee0"
     },
   ));
-  var body = jsonDecode(r.body);
-  var res = Response.fromJson(body);
-  print(json.convert(res));
+  return Response.fromJson(jsonDecode(r.body));
+}
+
+Future<List<String>> getRoutesForStop(String stopNumber) async {
   var routes = <String>[];
   for (var trip in res.trips) {
     if (!routes.contains(trip.summary.routeCode)) {
       routes.add(trip.summary.routeCode);
     }
   }
-  // print(jsonEncode(trips.toList()));
-  print(routes);
   return routes;
 }
 
