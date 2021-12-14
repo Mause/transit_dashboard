@@ -20,7 +20,7 @@ void main() async {
   }
 }
 
-void getTripsForStop(String stop) {
+Future<List<String>> getTripsForStop(String stop) {
   var r = await client.get(Uri.https(
     "realtime.transperth.info",
     "/SJP/StopTimetableService.svc/DataSets/PerthRestricted/StopTimetable",
@@ -44,6 +44,7 @@ void getTripsForStop(String stop) {
   }
   // print(jsonEncode(trips.toList()));
   print(routes);
+  return routes;
 }
 
 @JsonSerializable()
