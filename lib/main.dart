@@ -21,7 +21,9 @@ void main() async {
         "ApiKey": "ad89905f-d5a7-487f-a876-db39092c6ee0"
       },
     ));
-    var trips = Response.fromJson(jsonDecode(r.body)).trips;
+    var body = jsonDecode(r.body);
+    print(body);
+    var trips = Response.fromJson(body).trips;
     var routes = [];
     for (var trip in trips) {
       if (!routes.contains(trip.summary.routeCode)) {
