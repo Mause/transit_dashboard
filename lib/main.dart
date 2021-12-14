@@ -7,6 +7,7 @@ import 'package:timezone/standalone.dart' as tz;
 part 'main.g.dart';
 
 var client = SentryHttpClient(captureFailedRequests: true);
+var json = JsonEncoder.withIndent('  ');
 
 void main() async {
   await tz.initializeTimeZone();
@@ -27,7 +28,7 @@ void main() async {
     ));
     var body = jsonDecode(r.body);
     var res = Response.fromJson(body);
-    print(jsonEncode(res));
+    print(json.convert(res));
     var routes = [];
     for (var trip in res.trips) {
       if (!routes.contains(trip.summary.routeCode)) {
@@ -60,7 +61,8 @@ class Stop {
 
   Stop(this.description);
 
-  factory Stop.fromJson(Map<String, dynamic> json) => _$StopFromJson(json);
+  factory Stop.fromJson(Map<String, dynamic> json) =>
+      _$StopFromJson(json);
 
   Map<String, dynamic> toJson() => _$StopToJson(this);
 }
@@ -89,7 +91,7 @@ class Summary {
 class RealTimeInfo {
   String? estimatedArrivalTime;
   String? actualArrivalTime;
-
+  
   RealTimeInfo(this.estimatedArrivalTime, this.actualArrivalTime);
 
   factory RealTimeInfo.fromJson(Map<String, dynamic> json) =>
