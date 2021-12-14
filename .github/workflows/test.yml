@@ -23,4 +23,7 @@ jobs:
       - name: Install dependencies
         run: dart pub get
 
+      - name: Generate sources
+        run: dart run build_runner build --verbose
+
       - run: dart lib/main.dart
