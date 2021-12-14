@@ -14,7 +14,7 @@ List<NearbyTransitStop> nearbyStops(String apikey, Location location) {
     {
       "ApiKey": apikey,
       "format": "json",
-      "GeoCoordinate": f"${location.latitude},${location.longitude}"
+      "GeoCoordinate": "${location.latitude},${location.longitude}"
     }
   ));
 
