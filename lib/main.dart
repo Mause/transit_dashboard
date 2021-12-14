@@ -24,7 +24,7 @@ void main() async {
     )
   ).flatMap().toSet();
 
-  var nearbyBus = nearbyBuses[0];
+  var nearbyBus = nearbyBuses.first;
 
   createNotification(
     nearbyBus.requestedStop.description,
@@ -35,7 +35,7 @@ void main() async {
 
 void createNotification(String description, String routeCode, Duration delta) {}
 
-Future<Response> getStopTimetable(String stopNumber) {
+Future<Response> getStopTimetable(String stopNumber) async {
   var perth = tz.getLocation('Australia/Perth');
 
   var r = await client.get(Uri.https(
@@ -55,6 +55,7 @@ Future<Response> getStopTimetable(String stopNumber) {
 
 Future<List<String>> getRoutesForStop(String stopNumber) async {
   var routes = <String>[];
+  var res = await getStopTimetable(stopNumber);
   for (var trip in res.trips) {
     if (!routes.contains(trip.summary.routeCode)) {
       routes.add(trip.summary.routeCode);
@@ -91,7 +92,9 @@ class Stop {
 class Trip {
   RealTimeInfo? realTimeInfo;
   Summary summary;
+
   Trip(this.realTimeInfo, this.summary);
+
   factory Trip.fromJson(Map<String, dynamic> json) => _$TripFromJson(json);
 
   Map<String, dynamic> toJson() => _$TripToJson(this);
