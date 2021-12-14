@@ -2,12 +2,16 @@ import 'package:sentry/sentry.dart';
 import 'dart:core';
 import 'package:json_annotation/json_annotation.dart';
 import 'dart:convert';
+import 'package:timezone/data/latest.dart' as tz;
 
 part 'main.g.dart';
 
 var client = SentryHttpClient(captureFailedRequests: true);
 
 void main() async {
+  tz.initializeTimeZones();
+  var perth = tz.getLocation('Australia/Perth');
+
   try {
     var r = await client.get(Uri.https(
       "realtime.transperth.info",
@@ -16,7 +20,7 @@ void main() async {
         "StopUID": "PerthRestricted:11706",
         "IsRealTimeChecked": "true",
         "ReturnNotes": "true",
-        "Time": DateTime.now().toIso8601String(),
+        "Time": tz.TZDateTime.now(perth).toIso8601String(),
         "format": "json",
         "ApiKey": "ad89905f-d5a7-487f-a876-db39092c6ee0"
       },
