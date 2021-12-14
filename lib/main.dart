@@ -1,9 +1,10 @@
-import 'package:sentry/sentry.dart';
-import 'dart:core';
-import 'dart:async';
-import 'package:json_annotation/json_annotation.dart';
-import 'dart:convert';
+import 'package:sentry/sentry.dart' show SentryHttpClient;
+import 'dart:core' show DateTime, Duration, Future, List, Map, String, Uri;
+import 'package:json_annotation/json_annotation.dart' show JsonSerializable;
+import 'dart:convert' show JsonEncoder, jsonDecode;
 import 'package:timezone/standalone.dart' as tz;
+
+import 'journey_planner_service.dart' show Location, nearbyStops;
 
 part 'main.g.dart';
 
