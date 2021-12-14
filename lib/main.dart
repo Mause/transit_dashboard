@@ -28,11 +28,11 @@ void main() async {
   createNotification(
     nearbyBus.requestedStop.description,
     nearbyBus.route.code,
-    DateTime.now() - nearbyBus.realTimeInfo.estimatedArrivalTime
+    DateTime.now().difference(nearbyBus.realTimeInfo.estimatedArrivalTime)
   );
 }
 
-void createNotification(String description, String routeCode, Delta delta) {}
+void createNotification(String description, String routeCode, Duration delta) {}
 
 Future<Response> getStopTimetable(String stopNumber) {
   var perth = tz.getLocation('Australia/Perth');
