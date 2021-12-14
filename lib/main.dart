@@ -2,14 +2,14 @@ import 'package:sentry/sentry.dart';
 import 'dart:core';
 import 'package:json_annotation/json_annotation.dart';
 import 'dart:convert';
-import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/standalone.dart' as tz;
 
 part 'main.g.dart';
 
 var client = SentryHttpClient(captureFailedRequests: true);
 
 void main() async {
-  tz.initializeTimeZones();
+  tz.initializeTimeZone();
   var perth = tz.getLocation('Australia/Perth');
 
   try {
