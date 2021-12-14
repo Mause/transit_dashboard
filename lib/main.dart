@@ -61,8 +61,7 @@ class Stop {
 
   Stop(this.description);
 
-  factory Stop.fromJson(Map<String, dynamic> json) =>
-      _$StopFromJson(json);
+  factory Stop.fromJson(Map<String, dynamic> json) => _$StopFromJson(json);
 
   Map<String, dynamic> toJson() => _$StopToJson(this);
 }
@@ -91,7 +90,7 @@ class Summary {
 class RealTimeInfo {
   String? estimatedArrivalTime;
   String? actualArrivalTime;
-  
+
   RealTimeInfo(this.estimatedArrivalTime, this.actualArrivalTime);
 
   factory RealTimeInfo.fromJson(Map<String, dynamic> json) =>
