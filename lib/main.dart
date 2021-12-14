@@ -9,7 +9,7 @@ part 'main.g.dart';
 var client = SentryHttpClient(captureFailedRequests: true);
 
 void main() async {
-  tz.initializeTimeZone();
+  await tz.initializeTimeZone();
   var perth = tz.getLocation('Australia/Perth');
 
   try {
