@@ -11,7 +11,6 @@ var json = JsonEncoder.withIndent('  ');
 
 void main() async {
   await tz.initializeTimeZone();
-  var perth = tz.getLocation('Australia/Perth');
 
   try {
     await getTripsForStop("11706");
@@ -20,7 +19,9 @@ void main() async {
   }
 }
 
-Future<List<String>> getTripsForStop(String stop) async {
+Future<List<String>> getTripsForStop(String stopNumber) async {
+  var perth = tz.getLocation('Australia/Perth');
+
   var r = await client.get(Uri.https(
     "realtime.transperth.info",
     "/SJP/StopTimetableService.svc/DataSets/PerthRestricted/StopTimetable",
