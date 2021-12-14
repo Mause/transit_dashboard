@@ -37,7 +37,7 @@ Future<List<String>> getTripsForStop(String stopNumber) async {
   var body = jsonDecode(r.body);
   var res = Response.fromJson(body);
   print(json.convert(res));
-  var routes = List<String>();
+  var routes = <String>[];
   for (var trip in res.trips) {
     if (!routes.contains(trip.summary.routeCode)) {
       routes.add(trip.summary.routeCode);
