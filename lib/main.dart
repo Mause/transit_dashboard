@@ -46,7 +46,7 @@ class Response {
   List<Trip> trips;
   Stop requestedStop;
 
-  Response(this.trips, this.stop);
+  Response(this.trips, this.requestedStop);
 
   factory Response.fromJson(Map<String, dynamic> json) =>
       _$ResponseFromJson(json);
