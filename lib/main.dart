@@ -44,13 +44,26 @@ void main() async {
 @JsonSerializable()
 class Response {
   List<Trip> trips;
+  Stop requestedStop;
 
-  Response(this.trips);
+  Response(this.trips, this.stop);
 
   factory Response.fromJson(Map<String, dynamic> json) =>
       _$ResponseFromJson(json);
 
   Map<String, dynamic> toJson() => _$ResponseToJson(this);
+}
+
+@JsonSerializable()
+class Stop {
+  String description;
+
+  Stop(this.description);
+
+  factory Stop.fromJson(Map<String, dynamic> json) =>
+      _$StopFromJson(json);
+
+  Map<String, dynamic> toJson() => _$StopToJson(this);
 }
 
 @JsonSerializable()
@@ -75,7 +88,11 @@ class Summary {
 
 @JsonSerializable()
 class RealTimeInfo {
-  RealTimeInfo();
+  String? estimatedArrivalTime;
+  String? actualArrivalTime;
+  
+  RealTimeInfo(this.estimatedArrivalTime, this.actualArrivalTime);
+
   factory RealTimeInfo.fromJson(Map<String, dynamic> json) =>
       _$RealTimeInfoFromJson(json);
 
