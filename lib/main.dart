@@ -20,7 +20,7 @@ void main() async {
   }
 }
 
-Future<List<String>> getTripsForStop(String stop) {
+Future<List<String>> getTripsForStop(String stop) async {
   var r = await client.get(Uri.https(
     "realtime.transperth.info",
     "/SJP/StopTimetableService.svc/DataSets/PerthRestricted/StopTimetable",
