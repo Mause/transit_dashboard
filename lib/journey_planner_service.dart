@@ -18,7 +18,7 @@ Future<List<NearbyTransitStop>> nearbyStops(
         "GeoCoordinate": "${location.latitude},${location.longitude}"
       }));
 
-  return Response.fromJson(jsonDecode(res.body)).transitStopPaths;
+  return NearbyStopsResponse.fromJson(jsonDecode(res.body)).transitStopPaths;
 }
 
 @JsonSerializable()
@@ -49,15 +49,15 @@ class TransitStop {
 }
 
 @JsonSerializable()
-class Response {
+class NearbyStopsResponse {
   List<NearbyTransitStop> transitStopPaths;
 
-  Response(this.transitStopPaths);
+  NearbyStopsResponse(this.transitStopPaths);
 
-  factory Response.fromJson(Map<String, dynamic> json) =>
-      _$ResponseFromJson(json);
+  factory NearbyStopsResponse.fromJson(Map<String, dynamic> json) =>
+      _$NearbyStopsResponseFromJson(json);
 
-  Map<String, dynamic> toJson() => _$ResponseToJson(this);
+  Map<String, dynamic> toJson() => _$NearbyStopsResponseToJson(this);
 }
 
 class Location {
