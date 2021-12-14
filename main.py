@@ -50,6 +50,9 @@ def main():
 
 
 def analyse_trip(server_time, trip):
+    if 'RealTimeInfo' not in trip:
+        return
+
     depart_time = parse(trip["DepartTime"])
     estimated_depart_time = parse(
         trip["RealTimeInfo"].get("EstimatedArrivalTime")
