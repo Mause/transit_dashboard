@@ -85,7 +85,10 @@ class Trip {
 @JsonSerializable()
 class Summary {
   String routeCode;
-  Summary(this.routeCode);
+  String headsign;
+
+  Summary(this.routeCode, this.headsign);
+
   factory Summary.fromJson(Map<String, dynamic> json) =>
       _$SummaryFromJson(json);
 
