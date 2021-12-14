@@ -7,7 +7,8 @@ part 'journey_planner_service.g.dart';
 
 var client = SentryHttpClient(captureFailedRequests: true);
 
-Future<List<NearbyTransitStop>> nearbyStops(String apikey, Location location) async {
+Future<List<NearbyTransitStop>> nearbyStops(
+    String apikey, Location location) async {
   var res = await client.get(Uri.http(
       "au-journeyplanner.silverrailtech.com",
       "journeyplannerservice/v2/REST/Datasets/PerthRestricted/NearbyTransitStops",
