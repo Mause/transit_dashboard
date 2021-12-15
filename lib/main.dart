@@ -18,7 +18,7 @@ void main() async {
   var location = Location(-31, 115);
 
   var apiKey = bool.hasEnvironment("API_KEY")
-    ? String.fromEnvironment("API_KEY")
+    ? String.fromEnvironment("API_KEY");
   var stops = await nearbyStops(apiKey!, location);
 
   Set<Pair<Stop, Trip>> nearbyBuses = (await Future.wait(
