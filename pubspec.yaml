@@ -2,8 +2,8 @@ name: newtify
 version: 1.2.3
 
 environment:
-  sdk: '>=2.15.0 <3.0.0'
-  
+  sdk: '>=2.15.0-268.18.beta <3.0.0'
+
 dependencies: 
   json_annotation: ^4.1.0
   sentry: ^6.2.1
