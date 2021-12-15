@@ -66,7 +66,7 @@ Future<Response> getStopTimetable(String stopNumber) async {
 Future<List<String>> getRoutesForStop(String stopNumber) async {
   var routes = <String>[];
   var res = await getStopTimetable(stopNumber);
-  for (var trip in res.trips) {
+  for (var trip in res.trips!) {
     if (!routes.contains(trip.summary.routeCode)) {
       routes.add(trip.summary.routeCode);
     }
