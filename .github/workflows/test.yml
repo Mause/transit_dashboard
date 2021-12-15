@@ -39,6 +39,8 @@ jobs:
     container: cirrusci/flutter:beta
 
     steps:
+      - uses: actions/checkout@v2
+
       - name: Install dependencies
         run: flutter pub get
 
