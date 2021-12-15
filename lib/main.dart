@@ -17,7 +17,9 @@ void main() async {
 
   var location = Location(-31, 115);
 
-  var stops = await nearbyStops("", location);
+  var apiKey = String.fromEnvironment("API_KEY");
+  assert(!apiKey.isEmpty);
+  var stops = await nearbyStops(apiKey, location);
 
   Set<Pair<Stop, Trip>> nearbyBuses = (await Future.wait(
           stops.map((stop) => getStopTimetable(stop.transitStop.code))))
