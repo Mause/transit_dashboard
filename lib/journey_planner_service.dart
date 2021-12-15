@@ -1,5 +1,3 @@
-import 'dart:convert' show jsonDecode;
-
 import 'package:json_annotation/json_annotation.dart'
     show JsonSerializable, $checkedNew, $checkedConvert;
 
