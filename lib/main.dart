@@ -40,7 +40,9 @@ DateTime toDateTime(String s) {
   return DateTime(n.year, n.month, n.day, parts[0], parts[1], parts[2]);
 }
 
-void createNotification(String description, String routeCode, Duration delta) {}
+void createNotification(String description, String routeCode, Duration delta) {
+  print({"description": description, "routeCode": routeCode, "delta": delta});
+}
 
 Future<Response> getStopTimetable(String stopNumber) async {
   var perth = tz.getLocation('Australia/Perth');
