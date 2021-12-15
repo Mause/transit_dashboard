@@ -1,11 +1,11 @@
-import 'package:sentry/sentry.dart';
-import 'dart:core';
-import 'package:json_annotation/json_annotation.dart';
-import 'dart:convert';
+import 'dart:convert' show jsonDecode;
+
+import 'package:json_annotation/json_annotation.dart'
+    show JsonSerializable, $checkedNew, $checkedConvert;
+
+import 'client.dart' show client;
 
 part 'journey_planner_service.g.dart';
-
-var client = SentryHttpClient(captureFailedRequests: true);
 
 Future<List<NearbyTransitStop>> nearbyStops(
     String apikey, Location location) async {
@@ -63,5 +63,6 @@ class NearbyStopsResponse {
 class Location {
   num latitude;
   num longitude;
+
   Location(this.latitude, this.longitude);
 }

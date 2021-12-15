@@ -4,11 +4,11 @@ import 'package:json_annotation/json_annotation.dart' show JsonSerializable, $ch
 import 'package:sentry/sentry.dart' show SentryHttpClient;
 import 'package:timezone/standalone.dart' as tz;
 
+import 'client.dart' show client;
 import 'journey_planner_service.dart' show Location, nearbyStops;
 
 part 'main.g.dart';
 
-var client = SentryHttpClient(captureFailedRequests: true);
 var json = JsonEncoder.withIndent('  ');
 
 void main() async {
