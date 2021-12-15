@@ -18,19 +18,26 @@ void main() async {
 
   var stops = await nearbyStops("", location);
 
-  var nearbyBuses = (
-    await Future.wait(
-      stops.map((stop) => getStopTimetable(stop.transitStop.code))
-    )
-  ).flatMap().toSet();
+  Set<Pair<Stop, Trip>> nearbyBuses = (await Future.wait(
+          stops.map((stop) => getStopTimetable(stop.transitStop.code))))
+      .where((element) => element.trips != null)
+      .expand((element) =>
+          element.trips!.map((e) => Pair.of(element.requestedStop, e)))
+      .toSet();
 
   var nearbyBus = nearbyBuses.first;
 
   createNotification(
-    nearbyBus.requestedStop.description,
-    nearbyBus.route.code,
-    DateTime.now().difference(nearbyBus.realTimeInfo.estimatedArrivalTime)
-  );
+      nearbyBus.left.description,
+      nearbyBus.right.summary.routeCode + ' ' + nearbyBus.right.summary.headsign,
+      DateTime.now().difference(
+          toDateTime(nearbyBus.right.realTimeInfo!.estimatedArrivalTime!)));
+}
+
+DateTime toDateTime(String s) {
+  var n = DateTime.now();
+  var parts = s.split(':').map((e) => int.parse(e)).toList();
+  return DateTime(n.year, n.month, n.day, parts[0], parts[1], parts[2]);
 }
 
 void createNotification(String description, String routeCode, Duration delta) {}
