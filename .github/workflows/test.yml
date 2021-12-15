@@ -31,7 +31,7 @@ jobs:
       - name: Analyze project source
         run: dart analyze
 
-      - run: dart lib/main.dart
+      - run: dart lib/main.dart --dart-define API_KEY=${{ secrets.API_KEY }}
 
       - name: Verify formatting
         run: dart format --output=none --set-exit-if-changed .
@@ -52,7 +52,7 @@ jobs:
       - name: Analyze project source
         run: flutter analyze
 
-      - run: dart lib/main.dart
+      - run: dart lib/main.dart --dart-define API_KEY=${{ secrets.API_KEY }}
 
       - name: Verify formatting
         run: flutter format --output=none --set-exit-if-changed .
