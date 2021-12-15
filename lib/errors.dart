@@ -5,7 +5,7 @@ import 'dart:io' show HttpResponse;
 import 'package:json_annotation/json_annotation.dart'
     show JsonSerializable, $checkedNew, $checkedConvert;
 
-Future<T> <T> errorOrResult(HttpResponse res, T fromJson(dynamic) fromJson) {
+Future<T> errorOrResult<T>(HttpResponse res, T fromJson(dynamic) fromJson) {
   var body = jsonDecode(res.body);
   print(body);
   if (res.statusCode != 200) {
