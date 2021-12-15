@@ -76,7 +76,7 @@ Future<List<String>> getRoutesForStop(String stopNumber) async {
 
 @JsonSerializable()
 class Response {
-  List<Trip> trips;
+  List<Trip>? trips;
   Stop requestedStop;
 
   Response(this.trips, this.requestedStop);
