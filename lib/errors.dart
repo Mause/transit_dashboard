@@ -6,6 +6,8 @@ import 'package:http/http.dart' show Response;
 import 'package:json_annotation/json_annotation.dart'
     show JsonSerializable, $checkedNew, $checkedConvert;
 
+part 'errors.g.dart';
+
 T errorOrResult<T>(Response res, T Function(dynamic json) fromJson) {
   var body = jsonDecode(res.body);
   print(body);
