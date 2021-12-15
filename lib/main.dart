@@ -1,6 +1,7 @@
 import 'dart:convert' show JsonEncoder, jsonDecode;
 
-import 'package:json_annotation/json_annotation.dart' show JsonSerializable, $checkedConvert, $checkedNew;
+import 'package:json_annotation/json_annotation.dart'
+    show JsonSerializable, $checkedConvert, $checkedNew;
 import 'package:timezone/standalone.dart' as tz;
 
 import 'client.dart' show client;
@@ -25,12 +26,16 @@ void main() async {
           element.trips!.map((e) => Pair.of(element.requestedStop, e)))
       .toSet();
 
-  print(json.convert({'closest': nearbyBuses.map((e) => e.left.description).toSet().toList()}));
+  print(json.convert({
+    'closest': nearbyBuses.map((e) => e.left.description).toSet().toList()
+  }));
   var nearbyBus = nearbyBuses.first;
 
   createNotification(
       nearbyBus.left.description,
-      nearbyBus.right.summary.routeCode + ' ' + nearbyBus.right.summary.headsign,
+      nearbyBus.right.summary.routeCode +
+          ' ' +
+          nearbyBus.right.summary.headsign,
       DateTime.now().difference(
           toDateTime(nearbyBus.right.realTimeInfo!.estimatedArrivalTime!)));
 }
