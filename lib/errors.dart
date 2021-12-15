@@ -1,11 +1,12 @@
 import 'dart:async' show Future;
 import 'dart:convert' show jsonDecode;
-import 'dart:io' show HttpResponse;
+
+import 'package:http/http.dart' show Response;
 
 import 'package:json_annotation/json_annotation.dart'
     show JsonSerializable, $checkedNew, $checkedConvert;
 
-Future<T> errorOrResult<T>(HttpResponse res, T Function(dynamic json) fromJson) {
+T errorOrResult<T>(Response res, T Function(dynamic json) fromJson) {
   var body = jsonDecode(res.body);
   print(body);
   if (res.statusCode != 200) {
