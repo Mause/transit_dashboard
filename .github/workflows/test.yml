@@ -33,3 +33,22 @@ jobs:
 
       - name: Verify formatting
         run: dart format --output=none --set-exit-if-changed .
+
+  flutter:
+    runs-on: ubuntu-latest
+    container: cirrusci/flutter:beta
+
+    steps:
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Generate sources
+        run: flutter pub run build_runner build --verbose
+
+      - name: Analyze project source
+        run: flutter analyze
+
+      - run: dart lib/main.dart
+
+      - name: Verify formatting
+        run: flutter format --output=none --set-exit-if-changed .
