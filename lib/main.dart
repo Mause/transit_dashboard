@@ -53,7 +53,7 @@ Future<void> main() async {
   var arrivalDateTime = toDateTime(now, arrivalTime!);
   print({
     "now": now,
-    "realTimeInfo": realTimeInfo,
+    "realTimeInfo": realTimeInfo.toJson(),
     "arrivalDateTime": arrivalDateTime
   });
 
