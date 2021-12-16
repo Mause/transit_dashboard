@@ -3,6 +3,8 @@ import 'dart:convert' show JsonEncoder, jsonDecode;
 import 'package:json_annotation/json_annotation.dart'
     show JsonSerializable, $checkedConvert, $checkedNew;
 import 'package:timezone/standalone.dart' as tz;
+import 'package:logging/logging.dart' show Logger, Level;
+import 'package:logger/logger.dart' as logger;
 
 import 'client.dart' show client;
 import 'journey_planner_service.dart' show Location, nearbyStops;
@@ -12,8 +14,12 @@ part 'main.g.dart';
 
 var json = JsonEncoder.withIndent('  ');
 
-void main() async {
+Future<void> main() async {
   await tz.initializeTimeZone();
+  Logger.root.level = Level.ALL; // defaults to Level.INFO
+  var pretty = logger.Logger();
+  Logger.root.onRecord
+      .listen((record) => pretty.log(logger.Level.info, record));
 
   var location = Location(-31, 115);
 

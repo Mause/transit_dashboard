@@ -6,6 +6,7 @@ environment:
 
 dependencies: 
   json_annotation: ^4.1.0
+  logger: ^1.1.0
   logging: ^1.0.2
   sentry: ^6.2.1
   timezone: ^0.8.0
