@@ -1,16 +1,14 @@
-import 'dart:convert' show JsonEncoder, jsonDecode;
+import 'dart:convert' show JsonEncoder;
 
-import 'package:json_annotation/json_annotation.dart'
-    show JsonSerializable, $checkedConvert, $checkedNew;
+import 'package:chopper/chopper.dart' show ChopperClient, Request;
 import 'package:timezone/standalone.dart' as tz;
 import 'package:logging/logging.dart' show Logger, Level;
 import 'package:logger/logger.dart' as logger;
 
-import 'client.dart' show client;
+import 'generated_code/journey_planner.swagger.dart'
+    show Format, JourneyPlanner, Stop, StopTimetableResponse, Trip;
 import 'journey_planner_service.dart' show Location, nearbyStops;
 import 'pair.dart' show Pair;
-
-part 'main.g.dart';
 
 var json = JsonEncoder.withIndent('  ');
 
@@ -75,22 +73,27 @@ void createNotification(String description, String routeCode, Duration delta) {
   print({"description": description, "routeCode": routeCode, "delta": delta});
 }
 
-Future<Response> getStopTimetable(String stopNumber) async {
+Future<StopTimetableResponse> getStopTimetable(String stopNumber) async {
   var perth = tz.getLocation('Australia/Perth');
 
-  var r = await client.get(Uri.https(
-    "realtime.transperth.info",
-    "/SJP/StopTimetableService.svc/DataSets/PerthRestricted/StopTimetable",
-    {
-      "StopUID": "PerthRestricted:$stopNumber",
-      "IsRealTimeChecked": "true",
-      "ReturnNotes": "true",
-      "Time": tz.TZDateTime.now(perth).toIso8601String(),
-      "format": "json",
-      "ApiKey": "ad89905f-d5a7-487f-a876-db39092c6ee0"
-    },
-  ));
-  return Response.fromJson(jsonDecode(r.body));
+  var client = ChopperClient(services: [
+    JourneyPlanner.create()
+  ], interceptors: [
+    (Request request) => Request(
+        request.method,
+        request.url + "&apiKey=ad89905f-d5a7-487f-a876-db39092c6ee0",
+        request.baseUrl)
+  ], baseUrl: "http://au-journeyplanner.silverrailtech.com/journeyplannerservice/v2/REST")
+      .getService<JourneyPlanner>();
+
+  return (await client.dataSetsDatasetStopTimetableGet(
+          dataset: 'PerthRestricted',
+          stopUID: "PerthRestricted:$stopNumber",
+          isRealTimeChecked: true,
+          returnNotes: true,
+          time: tz.TZDateTime.now(perth).toIso8601String(),
+          format: Format.json))
+      .body!;
 }
 
 Future<List<String>> getRoutesForStop(String stopNumber) async {
@@ -102,66 +105,4 @@ Future<List<String>> getRoutesForStop(String stopNumber) async {
     }
   }
   return routes;
-}
-
-@JsonSerializable()
-class Response {
-  List<Trip>? trips;
-  Stop requestedStop;
-
-  Response(this.trips, this.requestedStop);
-
-  factory Response.fromJson(Map<String, dynamic> json) =>
-      _$ResponseFromJson(json);
-
-  Map<String, dynamic> toJson() => _$ResponseToJson(this);
-}
-
-@JsonSerializable()
-class Stop {
-  String description;
-
-  Stop(this.description);
-
-  factory Stop.fromJson(Map<String, dynamic> json) => _$StopFromJson(json);
-
-  Map<String, dynamic> toJson() => _$StopToJson(this);
-}
-
-@JsonSerializable()
-class Trip {
-  RealTimeInfo? realTimeInfo;
-  Summary summary;
-
-  Trip(this.realTimeInfo, this.summary);
-
-  factory Trip.fromJson(Map<String, dynamic> json) => _$TripFromJson(json);
-
-  Map<String, dynamic> toJson() => _$TripToJson(this);
-}
-
-@JsonSerializable()
-class Summary {
-  String routeCode;
-  String headsign;
-
-  Summary(this.routeCode, this.headsign);
-
-  factory Summary.fromJson(Map<String, dynamic> json) =>
-      _$SummaryFromJson(json);
-
-  Map<String, dynamic> toJson() => _$SummaryToJson(this);
-}
-
-@JsonSerializable()
-class RealTimeInfo {
-  String? estimatedArrivalTime;
-  String? actualArrivalTime;
-
-  RealTimeInfo(this.estimatedArrivalTime, this.actualArrivalTime);
-
-  factory RealTimeInfo.fromJson(Map<String, dynamic> json) =>
-      _$RealTimeInfoFromJson(json);
-
-  Map<String, dynamic> toJson() => _$RealTimeInfoToJson(this);
 }
