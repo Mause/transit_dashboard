@@ -17,7 +17,8 @@ Future<List<NearbyTransitStop>> nearbyStops(
         "GeoCoordinate": "${location.latitude},${location.longitude}"
       }));
 
-  return errorOrResult<NearbyStopsResponse>(res, NearbyStopsResponse.fromJson).transitStopPaths;
+  return errorOrResult<NearbyStopsResponse>(res, NearbyStopsResponse.fromJson)
+      .transitStopPaths;
 }
 
 @JsonSerializable()

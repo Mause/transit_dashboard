@@ -6,7 +6,8 @@ import 'package:json_annotation/json_annotation.dart'
 
 part 'errors.g.dart';
 
-T errorOrResult<T>(Response res, T Function(Map<String, dynamic> json) fromJson) {
+T errorOrResult<T>(
+    Response res, T Function(Map<String, dynamic> json) fromJson) {
   var body = jsonDecode(res.body);
   print(body);
   if (res.statusCode != 200) {
