@@ -40,13 +40,19 @@ Future<void> main() async {
   }));
   var nearbyBus = nearbyBuses.first;
 
+  var realTimeInfo = nearbyBus.right.realTimeInfo!;
+  var arrivalTime = realTimeInfo.estimatedArrivalTime == null
+      ? realTimeInfo.actualArrivalTime
+      : null;
+
+  assert(arrivalTime != null, "Arrival time must exist");
+
   createNotification(
       nearbyBus.left.description,
       nearbyBus.right.summary.routeCode +
           ' ' +
           nearbyBus.right.summary.headsign,
-      DateTime.now().difference(
-          toDateTime(nearbyBus.right.realTimeInfo!.estimatedArrivalTime!)));
+      DateTime.now().difference(toDateTime(arrivalTime!)));
 }
 
 DateTime toDateTime(String s) {
