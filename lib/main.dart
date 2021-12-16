@@ -16,6 +16,8 @@ var json = JsonEncoder.withIndent('  ');
 
 Future<void> main() async {
   await tz.initializeTimeZone();
+  var perth = tz.getLocation('Australia/Perth');
+
   Logger.root.level = Level.ALL; // defaults to Level.INFO
   var pretty = logger.Logger();
   Logger.root.onRecord
@@ -47,7 +49,7 @@ Future<void> main() async {
 
   assert(arrivalTime != null, "Arrival time must exist");
 
-  var now = DateTime.now();
+  var now = tz.TZDateTime.now(perth);
   var arrivalDateTime = toDateTime(now, arrivalTime!);
   print({
     "now": now,
@@ -63,9 +65,10 @@ Future<void> main() async {
       now.difference(arrivalDateTime));
 }
 
-DateTime toDateTime(DateTime now, String s) {
+DateTime toDateTime(tz.TZDateTime now, String s) {
   var parts = s.split(':').map((e) => int.parse(e)).toList();
-  return DateTime(now.year, now.month, now.day, parts[0], parts[1], parts[2]);
+  return tz.TZDateTime(
+      now.location, now.year, now.month, now.day, parts[0], parts[1], parts[2]);
 }
 
 void createNotification(String description, String routeCode, Duration delta) {
