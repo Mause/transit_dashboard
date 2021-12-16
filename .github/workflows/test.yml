@@ -13,29 +13,6 @@ jobs:
           pipenv install
       - run: pipenv run python main.py
 
-  dart:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v2
-      - uses: dart-lang/setup-dart@v1
-        with:
-          sdk: beta
-
-      - name: Install dependencies
-        run: dart pub get
-
-      - name: Generate sources
-        run: dart run build_runner build --verbose
-
-      - name: Analyze project source
-        run: dart analyze
-
-      - run: dart run --define=API_KEY=${{ secrets.API_KEY }}
-
-      - name: Verify formatting
-        run: dart format --output=none --set-exit-if-changed .
-
   flutter:
     runs-on: ubuntu-latest
     container: cirrusci/flutter:beta
@@ -51,6 +28,8 @@ jobs:
 
       - name: Analyze project source
         run: flutter analyze
+
+      - run: dart run --define=API_KEY=${{ secrets.API_KEY }}
 
       - run: flutter build apk --dart-define=API_KEY=${{ secrets.API_KEY }}
 
