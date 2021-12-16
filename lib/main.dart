@@ -1,167 +1,115 @@
-import 'dart:convert' show JsonEncoder, jsonDecode;
+import 'package:flutter/material.dart';
 
-import 'package:json_annotation/json_annotation.dart'
-    show JsonSerializable, $checkedConvert, $checkedNew;
-import 'package:timezone/standalone.dart' as tz;
-import 'package:logging/logging.dart' show Logger, Level;
-import 'package:logger/logger.dart' as logger;
-
-import 'client.dart' show client;
-import 'journey_planner_service.dart' show Location, nearbyStops;
-import 'pair.dart' show Pair;
-
-part 'main.g.dart';
-
-var json = JsonEncoder.withIndent('  ');
-
-Future<void> main() async {
-  await tz.initializeTimeZone();
-  var perth = tz.getLocation('Australia/Perth');
-
-  Logger.root.level = Level.ALL; // defaults to Level.INFO
-  var pretty = logger.Logger();
-  Logger.root.onRecord
-      .listen((record) => pretty.log(logger.Level.info, record));
-
-  var location = Location(-31.951548099520902, 115.85798556027436);
-
-  print('apiKey: ' + String.fromEnvironment("API_KEY"));
-  var apiKey =
-      bool.hasEnvironment("API_KEY") ? String.fromEnvironment("API_KEY") : null;
-  var stops = await nearbyStops(apiKey!, location);
-
-  Set<Pair<Stop, Trip>> nearbyBuses = (await Future.wait(
-          stops.map((stop) => getStopTimetable(stop.transitStop.code))))
-      .where((element) => element.trips != null)
-      .expand((element) =>
-          element.trips!.map((e) => Pair.of(element.requestedStop, e)))
-      .toSet();
-
-  print(json.convert({
-    'closest': nearbyBuses.map((e) => e.left.description).toSet().toList()
-  }));
-  var nearbyBus = nearbyBuses.first;
-
-  var realTimeInfo = nearbyBus.right.realTimeInfo!;
-  var arrivalTime = realTimeInfo.estimatedArrivalTime == null
-      ? realTimeInfo.actualArrivalTime
-      : null;
-
-  assert(arrivalTime != null, "Arrival time must exist");
-
-  var now = tz.TZDateTime.now(perth);
-  var arrivalDateTime = toDateTime(now, arrivalTime!);
-  print({
-    "now": now,
-    "realTimeInfo": realTimeInfo.toJson(),
-    "arrivalDateTime": arrivalDateTime
-  });
-
-  createNotification(
-      nearbyBus.left.description,
-      nearbyBus.right.summary.routeCode +
-          ' ' +
-          nearbyBus.right.summary.headsign,
-      now.difference(arrivalDateTime));
+void main() {
+  runApp(const MyApp());
 }
 
-DateTime toDateTime(tz.TZDateTime now, String s) {
-  var parts = s.split(':').map((e) => int.parse(e)).toList();
-  return tz.TZDateTime(
-      now.location, now.year, now.month, now.day, parts[0], parts[1], parts[2]);
-}
+class MyApp extends StatelessWidget {
+  const MyApp({Key? key}) : super(key: key);
 
-void createNotification(String description, String routeCode, Duration delta) {
-  print({"description": description, "routeCode": routeCode, "delta": delta});
-}
-
-Future<Response> getStopTimetable(String stopNumber) async {
-  var perth = tz.getLocation('Australia/Perth');
-
-  var r = await client.get(Uri.https(
-    "realtime.transperth.info",
-    "/SJP/StopTimetableService.svc/DataSets/PerthRestricted/StopTimetable",
-    {
-      "StopUID": "PerthRestricted:$stopNumber",
-      "IsRealTimeChecked": "true",
-      "ReturnNotes": "true",
-      "Time": tz.TZDateTime.now(perth).toIso8601String(),
-      "format": "json",
-      "ApiKey": "ad89905f-d5a7-487f-a876-db39092c6ee0"
-    },
-  ));
-  return Response.fromJson(jsonDecode(r.body));
-}
-
-Future<List<String>> getRoutesForStop(String stopNumber) async {
-  var routes = <String>[];
-  var res = await getStopTimetable(stopNumber);
-  for (var trip in res.trips!) {
-    if (!routes.contains(trip.summary.routeCode)) {
-      routes.add(trip.summary.routeCode);
-    }
+  // This widget is the root of your application.
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'Flutter Demo',
+      theme: ThemeData(
+        // This is the theme of your application.
+        //
+        // Try running your application with "flutter run". You'll see the
+        // application has a blue toolbar. Then, without quitting the app, try
+        // changing the primarySwatch below to Colors.green and then invoke
+        // "hot reload" (press "r" in the console where you ran "flutter run",
+        // or simply save your changes to "hot reload" in a Flutter IDE).
+        // Notice that the counter didn't reset back to zero; the application
+        // is not restarted.
+        primarySwatch: Colors.blue,
+      ),
+      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+    );
   }
-  return routes;
 }
 
-@JsonSerializable()
-class Response {
-  List<Trip>? trips;
-  Stop requestedStop;
+class MyHomePage extends StatefulWidget {
+  const MyHomePage({Key? key, required this.title}) : super(key: key);
 
-  Response(this.trips, this.requestedStop);
+  // This widget is the home page of your application. It is stateful, meaning
+  // that it has a State object (defined below) that contains fields that affect
+  // how it looks.
 
-  factory Response.fromJson(Map<String, dynamic> json) =>
-      _$ResponseFromJson(json);
+  // This class is the configuration for the state. It holds the values (in this
+  // case the title) provided by the parent (in this case the App widget) and
+  // used by the build method of the State. Fields in a Widget subclass are
+  // always marked "final".
 
-  Map<String, dynamic> toJson() => _$ResponseToJson(this);
+  final String title;
+
+  @override
+  State<MyHomePage> createState() => _MyHomePageState();
 }
 
-@JsonSerializable()
-class Stop {
-  String description;
+class _MyHomePageState extends State<MyHomePage> {
+  int _counter = 0;
 
-  Stop(this.description);
+  void _incrementCounter() {
+    setState(() {
+      // This call to setState tells the Flutter framework that something has
+      // changed in this State, which causes it to rerun the build method below
+      // so that the display can reflect the updated values. If we changed
+      // _counter without calling setState(), then the build method would not be
+      // called again, and so nothing would appear to happen.
+      _counter++;
+    });
+  }
 
-  factory Stop.fromJson(Map<String, dynamic> json) => _$StopFromJson(json);
-
-  Map<String, dynamic> toJson() => _$StopToJson(this);
-}
-
-@JsonSerializable()
-class Trip {
-  RealTimeInfo? realTimeInfo;
-  Summary summary;
-
-  Trip(this.realTimeInfo, this.summary);
-
-  factory Trip.fromJson(Map<String, dynamic> json) => _$TripFromJson(json);
-
-  Map<String, dynamic> toJson() => _$TripToJson(this);
-}
-
-@JsonSerializable()
-class Summary {
-  String routeCode;
-  String headsign;
-
-  Summary(this.routeCode, this.headsign);
-
-  factory Summary.fromJson(Map<String, dynamic> json) =>
-      _$SummaryFromJson(json);
-
-  Map<String, dynamic> toJson() => _$SummaryToJson(this);
-}
-
-@JsonSerializable()
-class RealTimeInfo {
-  String? estimatedArrivalTime;
-  String? actualArrivalTime;
-
-  RealTimeInfo(this.estimatedArrivalTime, this.actualArrivalTime);
-
-  factory RealTimeInfo.fromJson(Map<String, dynamic> json) =>
-      _$RealTimeInfoFromJson(json);
-
-  Map<String, dynamic> toJson() => _$RealTimeInfoToJson(this);
+  @override
+  Widget build(BuildContext context) {
+    // This method is rerun every time setState is called, for instance as done
+    // by the _incrementCounter method above.
+    //
+    // The Flutter framework has been optimized to make rerunning build methods
+    // fast, so that you can just rebuild anything that needs updating rather
+    // than having to individually change instances of widgets.
+    return Scaffold(
+      appBar: AppBar(
+        // Here we take the value from the MyHomePage object that was created by
+        // the App.build method, and use it to set our appbar title.
+        title: Text(widget.title),
+      ),
+      body: Center(
+        // Center is a layout widget. It takes a single child and positions it
+        // in the middle of the parent.
+        child: Column(
+          // Column is also a layout widget. It takes a list of children and
+          // arranges them vertically. By default, it sizes itself to fit its
+          // children horizontally, and tries to be as tall as its parent.
+          //
+          // Invoke "debug painting" (press "p" in the console, choose the
+          // "Toggle Debug Paint" action from the Flutter Inspector in Android
+          // Studio, or the "Toggle Debug Paint" command in Visual Studio Code)
+          // to see the wireframe for each widget.
+          //
+          // Column has various properties to control how it sizes itself and
+          // how it positions its children. Here we use mainAxisAlignment to
+          // center the children vertically; the main axis here is the vertical
+          // axis because Columns are vertical (the cross axis would be
+          // horizontal).
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            const Text(
+              'You have pushed the button this many times:',
+            ),
+            Text(
+              '$_counter',
+              style: Theme.of(context).textTheme.headline4,
+            ),
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: _incrementCounter,
+        tooltip: 'Increment',
+        child: const Icon(Icons.add),
+      ), // This trailing comma makes auto-formatting nicer for build methods.
+    );
+  }
 }

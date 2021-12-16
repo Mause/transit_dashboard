@@ -2,7 +2,7 @@ import 'dart:convert' show jsonDecode;
 
 import 'package:http/http.dart' show Response;
 import 'package:json_annotation/json_annotation.dart'
-    show JsonSerializable, $checkedNew, $checkedConvert;
+    show $checkedConvert, $checkedNew, JsonSerializable, JsonValue;
 import 'package:logging/logging.dart' show Logger;
 
 part 'errors.g.dart';
@@ -39,7 +39,7 @@ class Status {
 
 @JsonSerializable()
 class Detail {
-  int code;
+  Severity code;
   String message;
 
   Detail(this.code, this.message);
@@ -47,4 +47,13 @@ class Detail {
   factory Detail.fromJson(Map<String, dynamic> json) => _$DetailFromJson(json);
 
   Map<String, dynamic> toJson() => _$DetailToJson(this);
+}
+
+enum Severity {
+  @JsonValue(0)
+  success,
+  @JsonValue(1)
+  warning,
+  @JsonValue(2)
+  error
 }
