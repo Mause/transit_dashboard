@@ -3,13 +3,20 @@ import 'dart:convert' show jsonDecode;
 import 'package:http/http.dart' show Response;
 import 'package:json_annotation/json_annotation.dart'
     show JsonSerializable, $checkedNew, $checkedConvert;
+import 'package:logging/logging.dart' show Logger;
 
 part 'errors.g.dart';
+
+var logger = Logger("errors");
 
 T errorOrResult<T>(
     Response res, T Function(Map<String, dynamic> json) fromJson) {
   var body = jsonDecode(res.body);
-  print(body);
+  logger.info({
+    "statusCode": res.statusCode,
+    "reasonPhrase": res.reasonPhrase,
+    "body": body
+  });
   if (res.statusCode != 200) {
     var status = Status.fromJson(body['Status']);
     throw Exception(status.details[0].message);
