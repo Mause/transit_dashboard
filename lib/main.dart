@@ -47,18 +47,25 @@ Future<void> main() async {
 
   assert(arrivalTime != null, "Arrival time must exist");
 
+  var now = DateTime.now();
+  var arrivalDateTime = toDateTime(now, arrivalTime!);
+  print({
+    "now": now,
+    "realTimeInfo": realTimeInfo,
+    "arrivalDateTime": arrivalDateTime
+  });
+
   createNotification(
       nearbyBus.left.description,
       nearbyBus.right.summary.routeCode +
           ' ' +
           nearbyBus.right.summary.headsign,
-      DateTime.now().difference(toDateTime(arrivalTime!)));
+      now.difference(arrivalDateTime));
 }
 
-DateTime toDateTime(String s) {
-  var n = DateTime.now();
+DateTime toDateTime(DateTime now, String s) {
   var parts = s.split(':').map((e) => int.parse(e)).toList();
-  return DateTime(n.year, n.month, n.day, parts[0], parts[1], parts[2]);
+  return DateTime(now.year, now.month, now.day, parts[0], parts[1], parts[2]);
 }
 
 void createNotification(String description, String routeCode, Duration delta) {
