@@ -17,7 +17,7 @@ T errorOrResult<T>(
     "reasonPhrase": res.reasonPhrase,
     "body": body
   });
-  if (res.statusCode != 200) {
+  if (res.statusCode != 200 || body['Status']['Severity'] == 2) {
     var status = Status.fromJson(body['Status']);
     throw Exception(status.details[0].message);
   }
