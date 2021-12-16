@@ -1,4 +1,4 @@
-import 'package:transit_dashboard/main.dart' as transit;
+import 'package:transit_dashboard/transit.dart' as transit;
 
 Future<void> main() async {
   await transit.main();

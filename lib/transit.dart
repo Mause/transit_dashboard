@@ -10,7 +10,7 @@ import 'client.dart' show client;
 import 'journey_planner_service.dart' show Location, nearbyStops;
 import 'pair.dart' show Pair;
 
-part 'main.g.dart';
+part 'transit.g.dart';
 
 var json = JsonEncoder.withIndent('  ');
 
