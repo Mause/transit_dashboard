@@ -8,18 +8,64 @@
     }
   },
   "paths": {
-    "/DoJourneyPlan": {
-      "post": {
-        "requestBody": {
-          "$ref": "#/components/requestBodies/JourneyPlanningRequest"
-        },
+    "/DataSets/{dataset}/StopTimetable": {
+      "get": {
+        "operationId": "getStopTimetable",
+        "parameters": [
+          {
+            "name": "dataset",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "StopUID",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Time",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "ReturnNotes",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "IsRealTimeChecked",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "format",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Format"
+            },
+            "in": "query"
+          }
+        ],
         "responses": {
           "default": {
             "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/JourneyPlanningResponse"
+                  "$ref": "#/components/schemas/StopTimetableResponse"
                 }
               }
             }
@@ -41,31 +87,8 @@
         "name": "API-Key"
       }
     },
-    "requestBodies": {
-      "JourneyPlanningRequest": {
-        "required": true,
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/JourneyPlanningRequest"
-            }
-          }
-        }
-      }
-    },
     "schemas": {
-      "JourneyPlanningRequest": {
-        "type": "object",
-        "required": [
-          "DataSet"
-        ],
-        "properties": {
-          "DataSet": {
-            "type": "string"
-          }
-        }
-      },
-      "JourneyPlanningResponse": {
+      "StopTimetableResponse": {
         "type": "object",
         "required": [
           "Status"
@@ -73,8 +96,60 @@
         "properties": {
           "Status": {
             "$ref": "#/components/schemas/StatusResponse"
+          },
+          "Trips": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Trip"
+            }
+          },
+          "RequestedStop": {
+            "$ref": "#/components/schemas/Stop"
           }
         }
+      },
+      "Stop": {
+        "type": "object",
+        "required": ["Description"],
+        "properties": {
+          "Description": {
+            "type": "string"
+          }
+        }
+      },
+      "Trip": {
+        "type": "object",
+        "required": [
+          "RealTimeInfo",
+          "Summary"
+        ],
+        "properties": {
+          "Summary": {
+            "$ref": "#/components/schemas/TripSummary"
+          },
+          "RealTimeInfo": {
+            "$ref": "#/components/schemas/RealTimeInfo"
+          }
+        }
+      },
+      "TripSummary": {
+        "type": "object",
+        "required": [
+          "Headsign",
+          "RouteCode"
+        ],
+        "properties": {
+          "Headsign": {
+            "type": "string"
+          },
+          "RouteCode": {
+            "type": "string"
+          }
+        }
+      },
+      "RealTimeInfo": {
+        "type": "object",
+        "properties": {}
       },
       "StatusResponse": {
         "type": "object",
@@ -83,6 +158,13 @@
             "type": "number"
           }
         }
+      },
+      "Format": {
+        "type": "string",
+        "enum": [
+          "json",
+          "xml"
+        ]
       }
     }
   }
