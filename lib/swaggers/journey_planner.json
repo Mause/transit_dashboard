@@ -1,0 +1,89 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Journey Planner",
+    "version": "0.0.1",
+    "contact": {
+      "url": "http://journeyplanner.silverrailtech.com/JourneyPlanner/Help"
+    }
+  },
+  "paths": {
+    "/DoJourneyPlan": {
+      "post": {
+        "requestBody": {
+          "$ref": "#/components/requestBodies/JourneyPlanningRequest"
+        },
+        "responses": {
+          "default": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/JourneyPlanningResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "ApiKey": []
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "ApiKey": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "API-Key"
+      }
+    },
+    "requestBodies": {
+      "JourneyPlanningRequest": {
+        "required": true,
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/JourneyPlanningRequest"
+            }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "JourneyPlanningRequest": {
+        "type": "object",
+        "required": [
+          "DataSet"
+        ],
+        "properties": {
+          "DataSet": {
+            "type": "string"
+          }
+        }
+      },
+      "JourneyPlanningResponse": {
+        "type": "object",
+        "required": [
+          "Status"
+        ],
+        "properties": {
+          "Status": {
+            "$ref": "#/components/schemas/StatusResponse"
+          }
+        }
+      },
+      "StatusResponse": {
+        "type": "object",
+        "properties": {
+          "Severity": {
+            "type": "number"
+          }
+        }
+      }
+    }
+  }
+}
