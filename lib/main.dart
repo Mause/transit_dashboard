@@ -21,7 +21,7 @@ Future<void> main() async {
   Logger.root.onRecord
       .listen((record) => pretty.log(logger.Level.info, record));
 
-  var location = Location(-31, 115);
+  var location = Location(-31.951548099520902, 115.85798556027436);
 
   print('apiKey: ' + String.fromEnvironment("API_KEY"));
   var apiKey =
