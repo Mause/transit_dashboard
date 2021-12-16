@@ -1,5 +1,5 @@
 {
-  "openapi": "3.0.3",
+  "openapi": "3.1.0",
   "info": {
     "title": "Journey Planner",
     "version": "0.0.1",
@@ -74,6 +74,16 @@
       }
     }
   },
+  "responses": {
+    "400": {
+      "description": "Request error",
+      "$ref": "#/components/schemas/Error"
+    },
+    "401": {
+      "description": "Auth error",
+      "$ref": "#/components/schemas/Error"
+    }
+  },
   "security": [
     {
       "ApiKey": []
@@ -88,6 +98,15 @@
       }
     },
     "schemas": {
+      "Error": {
+        "type": "object",
+        "required": ["Status"],
+        "properties": {
+          "Status": {
+            "$ref": "#/components/schemas/StatusResponse"
+          }
+        }
+      },
       "StopTimetableResponse": {
         "type": "object",
         "required": [
@@ -164,9 +183,33 @@
       },
       "StatusResponse": {
         "type": "object",
+        "required": [
+          "Severity"
+        ],
         "properties": {
           "Severity": {
             "type": "number"
+          },
+          "Details": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Detail"
+            }
+          }
+        }
+      },
+      "Detail": {
+        "type": "object",
+        "required": [
+          "Code",
+          "Message"
+        ],
+        "properties": {
+          "Code": {
+            "type": "number"
+          },
+          "Message": {
+            "type": "string"
           }
         }
       },
