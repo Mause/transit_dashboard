@@ -1,11 +1,10 @@
-import 'package:sentry/sentry.dart';
-import 'dart:core';
-import 'package:json_annotation/json_annotation.dart';
-import 'dart:convert';
+import 'package:json_annotation/json_annotation.dart'
+    show JsonSerializable, $checkedNew, $checkedConvert;
+
+import 'client.dart' show client;
+import 'errors.dart' show errorOrResult;
 
 part 'journey_planner_service.g.dart';
-
-var client = SentryHttpClient(captureFailedRequests: true);
 
 Future<List<NearbyTransitStop>> nearbyStops(
     String apikey, Location location) async {
@@ -18,7 +17,8 @@ Future<List<NearbyTransitStop>> nearbyStops(
         "GeoCoordinate": "${location.latitude},${location.longitude}"
       }));
 
-  return Response.fromJson(jsonDecode(res.body)).transitStopPaths;
+  return errorOrResult<NearbyStopsResponse>(res, NearbyStopsResponse.fromJson)
+      .transitStopPaths;
 }
 
 @JsonSerializable()
@@ -49,19 +49,20 @@ class TransitStop {
 }
 
 @JsonSerializable()
-class Response {
+class NearbyStopsResponse {
   List<NearbyTransitStop> transitStopPaths;
 
-  Response(this.transitStopPaths);
+  NearbyStopsResponse(this.transitStopPaths);
 
-  factory Response.fromJson(Map<String, dynamic> json) =>
-      _$ResponseFromJson(json);
+  factory NearbyStopsResponse.fromJson(Map<String, dynamic> json) =>
+      _$NearbyStopsResponseFromJson(json);
 
-  Map<String, dynamic> toJson() => _$ResponseToJson(this);
+  Map<String, dynamic> toJson() => _$NearbyStopsResponseToJson(this);
 }
 
 class Location {
   num latitude;
   num longitude;
+
   Location(this.latitude, this.longitude);
 }
