@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'dart:convert' show JsonEncoder, jsonDecode;
 
 import 'package:json_annotation/json_annotation.dart'
@@ -12,7 +14,7 @@ import 'pair.dart' show Pair;
 
 part 'transit.g.dart';
 
-var json = JsonEncoder.withIndent('  ');
+var json = const JsonEncoder.withIndent('  ');
 
 Future<void> main() async {
   await tz.initializeTimeZone();
@@ -25,9 +27,10 @@ Future<void> main() async {
 
   var location = Location(-31.951548099520902, 115.85798556027436);
 
-  print('apiKey: ' + String.fromEnvironment("API_KEY"));
-  var apiKey =
-      bool.hasEnvironment("API_KEY") ? String.fromEnvironment("API_KEY") : null;
+  print('apiKey: ' + const String.fromEnvironment("API_KEY"));
+  var apiKey = const bool.hasEnvironment("API_KEY")
+      ? const String.fromEnvironment("API_KEY")
+      : null;
   var stops = await nearbyStops(apiKey!, location);
 
   Set<Pair<Stop, Trip>> nearbyBuses = (await Future.wait(
