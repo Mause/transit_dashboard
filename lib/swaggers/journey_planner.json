@@ -110,7 +110,9 @@
       },
       "Stop": {
         "type": "object",
-        "required": ["Description"],
+        "required": [
+          "Description"
+        ],
         "properties": {
           "Description": {
             "type": "string"
@@ -149,7 +151,16 @@
       },
       "RealTimeInfo": {
         "type": "object",
-        "properties": {}
+        "properties": {
+          "estimatedArrivalTime": {
+            "type": "string",
+            "format": "time"
+          },
+          "actualArrivalTime": {
+            "type": "string",
+            "format": "time"
+          }
+        }
       },
       "StatusResponse": {
         "type": "object",
