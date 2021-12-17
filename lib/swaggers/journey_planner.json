@@ -1,5 +1,5 @@
 {
-  "openapi": "3.0.3",
+  "openapi": "3.0.0",
   "info": {
     "title": "Journey Planner",
     "version": "0.0.1",
@@ -8,18 +8,106 @@
     }
   },
   "paths": {
-    "/DoJourneyPlan": {
-      "post": {
-        "requestBody": {
-          "$ref": "#/components/requestBodies/JourneyPlanningRequest"
-        },
+    "/DataSets/{dataset}/NearbyTransitStops": {
+      "get": {
+        "parameters": [
+          {
+            "name": "dataset",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "format",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Format"
+            },
+            "in": "query"
+          },
+          {
+            "name": "GeoCoordinate",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
         "responses": {
           "default": {
             "description": "OK",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/JourneyPlanningResponse"
+                  "$ref": "#/components/schemas/NearbyTransitStops"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/DataSets/{dataset}/StopTimetable": {
+      "get": {
+        "operationId": "getStopTimetable",
+        "parameters": [
+          {
+            "name": "dataset",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "StopUID",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "Time",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
+          },
+          {
+            "name": "ReturnNotes",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "IsRealTimeChecked",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "format",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Format"
+            },
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StopTimetableResponse"
                 }
               }
             }
@@ -34,6 +122,14 @@
     }
   ],
   "components": {
+    "responses": {
+      "400": {
+        "$ref": "#/components/schemas/Error"
+      },
+      "401": {
+        "$ref": "#/components/schemas/Error"
+      }
+    },
     "securitySchemes": {
       "ApiKey": {
         "type": "apiKey",
@@ -41,31 +137,8 @@
         "name": "API-Key"
       }
     },
-    "requestBodies": {
-      "JourneyPlanningRequest": {
-        "required": true,
-        "content": {
-          "application/json": {
-            "schema": {
-              "$ref": "#/components/schemas/JourneyPlanningRequest"
-            }
-          }
-        }
-      }
-    },
     "schemas": {
-      "JourneyPlanningRequest": {
-        "type": "object",
-        "required": [
-          "DataSet"
-        ],
-        "properties": {
-          "DataSet": {
-            "type": "string"
-          }
-        }
-      },
-      "JourneyPlanningResponse": {
+      "Error": {
         "type": "object",
         "required": [
           "Status"
@@ -76,10 +149,162 @@
           }
         }
       },
-      "StatusResponse": {
+      "StopTimetableResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Error"
+          },
+          {
+            "type": "object",
+            "required": [
+              "Status"
+            ],
+            "properties": {
+              "Status": {
+                "$ref": "#/components/schemas/StatusResponse"
+              },
+              "Trips": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Trip"
+                }
+              },
+              "RequestedStop": {
+                "$ref": "#/components/schemas/Stop"
+              }
+            }
+          }
+        ]
+      },
+      "Stop": {
+        "type": "object",
+        "required": [
+          "Description",
+          "Code"
+        ],
+        "properties": {
+          "Description": {
+            "type": "string"
+          },
+          "Code": {
+            "type": "string"
+          }
+        }
+      },
+      "Trip": {
+        "type": "object",
+        "required": [
+          "RealTimeInfo",
+          "Summary"
+        ],
+        "properties": {
+          "Summary": {
+            "$ref": "#/components/schemas/TripSummary"
+          },
+          "RealTimeInfo": {
+            "$ref": "#/components/schemas/RealTimeInfo"
+          }
+        }
+      },
+      "TripSummary": {
+        "type": "object",
+        "required": [
+          "Headsign",
+          "RouteCode"
+        ],
+        "properties": {
+          "Headsign": {
+            "type": "string"
+          },
+          "RouteCode": {
+            "type": "string"
+          }
+        }
+      },
+      "RealTimeInfo": {
         "type": "object",
         "properties": {
+          "EstimatedArrivalTime": {
+            "type": "string",
+            "format": "time"
+          },
+          "ActualArrivalTime": {
+            "type": "string",
+            "format": "time"
+          }
+        }
+      },
+      "StatusResponse": {
+        "type": "object",
+        "required": [
+          "Severity"
+        ],
+        "properties": {
           "Severity": {
+            "type": "number"
+          },
+          "Details": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Detail"
+            }
+          }
+        }
+      },
+      "Detail": {
+        "type": "object",
+        "required": [
+          "Code",
+          "Message"
+        ],
+        "properties": {
+          "Code": {
+            "type": "number"
+          },
+          "Message": {
+            "type": "string"
+          }
+        }
+      },
+      "Format": {
+        "type": "string",
+        "enum": [
+          "json",
+          "xml"
+        ]
+      },
+      "NearbyTransitStops": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Error"
+          },
+          {
+            "type": "object",
+            "required": [
+              "TransitStopPaths"
+            ],
+            "properties": {
+              "TransitStopPaths": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/NearbyTransitStop"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "NearbyTransitStop": {
+        "type": "object",
+        "required": [
+          "TransitStop",
+          "Distance"
+        ],
+        "properties": {
+          "TransitStop": {
+            "$ref": "#/components/schemas/Stop"
+          },
+          "Distance": {
             "type": "number"
           }
         }

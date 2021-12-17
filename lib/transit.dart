@@ -1,43 +1,64 @@
 // ignore_for_file: avoid_print
 
-import 'dart:convert' show JsonEncoder, jsonDecode;
+import 'dart:convert' show JsonEncoder;
 
-import 'package:json_annotation/json_annotation.dart'
-    show JsonSerializable, $checkedConvert, $checkedNew;
+import 'package:chopper/chopper.dart'
+    show ChopperClient, ChopperService, Request;
+import 'package:intl/intl.dart';
+import 'package:logging/logging.dart' show Logger;
 import 'package:timezone/standalone.dart' as tz;
-import 'package:logging/logging.dart' show Logger, Level;
-import 'package:logger/logger.dart' as logger;
+import 'package:transit_dashboard/errors.dart' show errorOrResult;
+import 'package:transit_dashboard/loggers.dart' show setupLogging;
 
-import 'client.dart' show client;
+import 'generated_code/journey_planner.swagger.dart'
+    show
+        Format,
+        JourneyPlanner,
+        RealTimeInfo,
+        Stop,
+        StopTimetableResponse,
+        Trip;
 import 'journey_planner_service.dart' show Location, nearbyStops;
 import 'pair.dart' show Pair;
 
-part 'transit.g.dart';
-
 var json = const JsonEncoder.withIndent('  ');
+var logger = Logger('transit.dart');
 
 Future<void> main() async {
   await tz.initializeTimeZone();
   var perth = tz.getLocation('Australia/Perth');
-
-  Logger.root.level = Level.ALL; // defaults to Level.INFO
-  var pretty = logger.Logger();
-  Logger.root.onRecord
-      .listen((record) => pretty.log(logger.Level.info, record));
+  setupLogging();
 
   var location = Location(-31.951548099520902, 115.85798556027436);
 
-  print('apiKey: ' + const String.fromEnvironment("API_KEY"));
-  var apiKey = const bool.hasEnvironment("API_KEY")
-      ? const String.fromEnvironment("API_KEY")
-      : null;
-  var stops = await nearbyStops(apiKey!, location);
+  var apiKey = 'eac7a147-0831-4fcf-8fa8-a5e8ffcfa039';
+  var stops = await nearbyStops(apiKey, location);
+  logger.info('stops: ${stops.length}');
 
-  Set<Pair<Stop, Trip>> nearbyBuses = (await Future.wait(
-          stops.map((stop) => getStopTimetable(stop.transitStop.code))))
-      .where((element) => element.trips != null)
+  JourneyPlanner client = getClient(
+      JourneyPlanner.create,
+      // "http://au-journeyplanner.silverrailtech.com/journeyplannerservice/v2/REST",
+      "http://realtime.transperth.info/SJP/StopTimetableService.svc/",
+      // apiKey
+      "ad89905f-d5a7-487f-a876-db39092c6ee0");
+
+  Set<Pair<Stop, Trip>> nearbyBuses = (await Future.wait(stops
+          .map((stop) => getStopTimetable(client, stop.transitStop!.code!))))
+      .where((element) {
+        if (element.trips == null) {
+          logger.warning('${element.toJson()} has no trips');
+        }
+        return element.trips != null;
+      })
       .expand((element) =>
-          element.trips!.map((e) => Pair.of(element.requestedStop, e)))
+          element.trips!.map((e) => Pair.of(element.requestedStop!, e)))
+      .where((element) {
+        var good = getRealtime(element.right.realTimeInfo) != null;
+        if (!good) {
+          logger.warning('${element.right.toJson()} has no real time info');
+        }
+        return good;
+      })
       .toSet();
 
   print(json.convert({
@@ -46,9 +67,7 @@ Future<void> main() async {
   var nearbyBus = nearbyBuses.first;
 
   var realTimeInfo = nearbyBus.right.realTimeInfo!;
-  var arrivalTime = realTimeInfo.estimatedArrivalTime == null
-      ? realTimeInfo.actualArrivalTime
-      : null;
+  String? arrivalTime = getRealtime(realTimeInfo);
 
   assert(arrivalTime != null, "Arrival time must exist");
 
@@ -61,11 +80,37 @@ Future<void> main() async {
   });
 
   createNotification(
-      nearbyBus.left.description,
-      nearbyBus.right.summary.routeCode +
+      nearbyBus.left.description!,
+      nearbyBus.right.summary!.routeCode! +
           ' ' +
-          nearbyBus.right.summary.headsign,
+          nearbyBus.right.summary!.headsign!,
       now.difference(arrivalDateTime));
+}
+
+String? getRealtime(RealTimeInfo? realTimeInfo) {
+  if (realTimeInfo == null) {
+    return null;
+  } else if (realTimeInfo.estimatedArrivalTime != null) {
+    return realTimeInfo.estimatedArrivalTime;
+  } else {
+    return realTimeInfo.actualArrivalTime;
+  }
+}
+
+T getClient<T extends ChopperService>(
+    T Function() create, String baseUrl, String apiKey) {
+  var baseClient = create();
+  return ChopperClient(
+          services: [baseClient],
+          converter: baseClient.client.converter,
+          interceptors: [
+            (Request request) => Request(
+                request.method, request.url, request.baseUrl,
+                parameters: request.parameters
+                  ..putIfAbsent('ApiKey', () => apiKey))
+          ],
+          baseUrl: baseUrl)
+      .getService<T>();
 }
 
 DateTime toDateTime(tz.TZDateTime now, String s) {
@@ -78,93 +123,17 @@ void createNotification(String description, String routeCode, Duration delta) {
   print({"description": description, "routeCode": routeCode, "delta": delta});
 }
 
-Future<Response> getStopTimetable(String stopNumber) async {
+Future<StopTimetableResponse> getStopTimetable(
+    JourneyPlanner client, String stopNumber) async {
   var perth = tz.getLocation('Australia/Perth');
 
-  var r = await client.get(Uri.https(
-    "realtime.transperth.info",
-    "/SJP/StopTimetableService.svc/DataSets/PerthRestricted/StopTimetable",
-    {
-      "StopUID": "PerthRestricted:$stopNumber",
-      "IsRealTimeChecked": "true",
-      "ReturnNotes": "true",
-      "Time": tz.TZDateTime.now(perth).toIso8601String(),
-      "format": "json",
-      "ApiKey": "ad89905f-d5a7-487f-a876-db39092c6ee0"
-    },
-  ));
-  return Response.fromJson(jsonDecode(r.body));
-}
+  var time = DateFormat('yyyy-MM-ddTHH:mm').format(tz.TZDateTime.now(perth));
 
-Future<List<String>> getRoutesForStop(String stopNumber) async {
-  var routes = <String>[];
-  var res = await getStopTimetable(stopNumber);
-  for (var trip in res.trips!) {
-    if (!routes.contains(trip.summary.routeCode)) {
-      routes.add(trip.summary.routeCode);
-    }
-  }
-  return routes;
-}
-
-@JsonSerializable()
-class Response {
-  List<Trip>? trips;
-  Stop requestedStop;
-
-  Response(this.trips, this.requestedStop);
-
-  factory Response.fromJson(Map<String, dynamic> json) =>
-      _$ResponseFromJson(json);
-
-  Map<String, dynamic> toJson() => _$ResponseToJson(this);
-}
-
-@JsonSerializable()
-class Stop {
-  String description;
-
-  Stop(this.description);
-
-  factory Stop.fromJson(Map<String, dynamic> json) => _$StopFromJson(json);
-
-  Map<String, dynamic> toJson() => _$StopToJson(this);
-}
-
-@JsonSerializable()
-class Trip {
-  RealTimeInfo? realTimeInfo;
-  Summary summary;
-
-  Trip(this.realTimeInfo, this.summary);
-
-  factory Trip.fromJson(Map<String, dynamic> json) => _$TripFromJson(json);
-
-  Map<String, dynamic> toJson() => _$TripToJson(this);
-}
-
-@JsonSerializable()
-class Summary {
-  String routeCode;
-  String headsign;
-
-  Summary(this.routeCode, this.headsign);
-
-  factory Summary.fromJson(Map<String, dynamic> json) =>
-      _$SummaryFromJson(json);
-
-  Map<String, dynamic> toJson() => _$SummaryToJson(this);
-}
-
-@JsonSerializable()
-class RealTimeInfo {
-  String? estimatedArrivalTime;
-  String? actualArrivalTime;
-
-  RealTimeInfo(this.estimatedArrivalTime, this.actualArrivalTime);
-
-  factory RealTimeInfo.fromJson(Map<String, dynamic> json) =>
-      _$RealTimeInfoFromJson(json);
-
-  Map<String, dynamic> toJson() => _$RealTimeInfoToJson(this);
+  return errorOrResult(await client.dataSetsDatasetStopTimetableGet(
+      dataset: 'PerthRestricted',
+      stopUID: "PerthRestricted:$stopNumber",
+      isRealTimeChecked: true,
+      returnNotes: true,
+      time: time,
+      format: Format.json));
 }

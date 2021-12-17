@@ -130,3 +130,5 @@ dmypy.json
 .dart_tool/
 .packages
 *.g.dart
+lib/generated_code
+.idea

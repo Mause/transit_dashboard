@@ -1,59 +1,20 @@
-import 'dart:convert' show jsonDecode;
-
-import 'package:http/http.dart' show Response;
-import 'package:json_annotation/json_annotation.dart'
-    show $checkedConvert, $checkedNew, JsonSerializable, JsonValue;
+import 'package:chopper/chopper.dart' show Response;
 import 'package:logging/logging.dart' show Logger;
+import 'package:transit_dashboard/generated_code/journey_planner.swagger.dart'
+    show Error;
 
-part 'errors.g.dart';
+var logger = Logger("errors.dart");
 
-var logger = Logger("errors");
-
-T errorOrResult<T>(
-    Response res, T Function(Map<String, dynamic> json) fromJson) {
-  var body = jsonDecode(res.body);
-  logger.info({
-    "statusCode": res.statusCode,
-    "reasonPhrase": res.reasonPhrase,
-    "body": body
-  });
-  if (res.statusCode != 200 || body['Status']['Severity'] == 2) {
-    var status = Status.fromJson(body['Status']);
-    throw Exception(status.details[0].message);
+T errorOrResult<T extends Error>(Response<T> res) {
+  var status = res.body!.status!;
+  var severity = status.severity;
+  if (severity == 2) {
+    throw Exception(status.details![0].message);
+  } else if (severity == 1) {
+    for (var warning in status.details!) {
+      logger.warning(warning);
+    }
   }
 
-  return fromJson(body);
-}
-
-@JsonSerializable()
-class Status {
-  int severity;
-  List<Detail> details;
-
-  Status(this.severity, this.details);
-
-  factory Status.fromJson(Map<String, dynamic> json) => _$StatusFromJson(json);
-
-  Map<String, dynamic> toJson() => _$StatusToJson(this);
-}
-
-@JsonSerializable()
-class Detail {
-  Severity code;
-  String message;
-
-  Detail(this.code, this.message);
-
-  factory Detail.fromJson(Map<String, dynamic> json) => _$DetailFromJson(json);
-
-  Map<String, dynamic> toJson() => _$DetailToJson(this);
-}
-
-enum Severity {
-  @JsonValue(0)
-  success,
-  @JsonValue(1)
-  warning,
-  @JsonValue(2)
-  error
+  return res.body!;
 }
