@@ -46,7 +46,7 @@ Future<void> main() async {
           .map((stop) => getStopTimetable(client, stop.transitStop!.code!))))
       .where((element) {
         if (element.trips == null) {
-          logger.warning('$element has no trips');
+          logger.warning('${element.toJson()} has no trips');
         }
         return element.trips != null;
       })
@@ -55,7 +55,7 @@ Future<void> main() async {
       .where((element) {
         var good = getRealtime(element.right.realTimeInfo) != null;
         if (!good) {
-          logger.warning('${element.right} has no real time info');
+          logger.warning('${element.right.toJson()} has no real time info');
         }
         return good;
       })
