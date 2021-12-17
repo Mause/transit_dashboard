@@ -44,10 +44,21 @@ Future<void> main() async {
 
   Set<Pair<Stop, Trip>> nearbyBuses = (await Future.wait(stops
           .map((stop) => getStopTimetable(client, stop.transitStop!.code!))))
-      .where((element) => element.trips != null)
+      .where((element) {
+        if (element.trips == null) {
+          logger.warning('$element has no trips');
+        }
+        return element.trips != null;
+      })
       .expand((element) =>
           element.trips!.map((e) => Pair.of(element.requestedStop!, e)))
-      .where((element) => getRealtime(element.right.realTimeInfo) != null)
+      .where((element) {
+        var good = getRealtime(element.right.realTimeInfo) != null;
+        if (!good) {
+          logger.warning('${element.right} has no real time info');
+        }
+        return good;
+      })
       .toSet();
 
   print(json.convert({
