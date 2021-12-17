@@ -43,7 +43,7 @@ android {
 
     defaultConfig {
         applicationId "me.mause.transit_dashboard"
-        minSdkVersion flutter.minSdkVersion
+        minSdkVersion 21
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
