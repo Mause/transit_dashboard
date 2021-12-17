@@ -1,8 +1,6 @@
 import 'dart:convert' show jsonDecode;
 
 import 'package:http/http.dart' show Response;
-import 'package:json_annotation/json_annotation.dart'
-    show JsonSerializable, $checkedNew, $checkedConvert;
 import 'package:logging/logging.dart' show Logger;
 import 'package:transit_dashboard/generated_code/journey_planner.swagger.dart';
 

@@ -8,6 +8,45 @@
     }
   },
   "paths": {
+    "/DataSets/{dataset}/NearbyTransitStops": {
+      "get": {
+        "parameters": [
+          {
+            "name": "dataset",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "format",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Format"
+            },
+            "in": "query"
+          },
+          {
+            "name": "GeoCoordinate",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "$ref": "#/components/schemas/NearbyTransitStops"
+              }
+            }
+          }
+        }
+      }
+    },
     "/DataSets/{dataset}/StopTimetable": {
       "get": {
         "operationId": "getStopTimetable",
@@ -86,7 +125,7 @@
   },
   "security": [
     {
-      "ApiKey": []
+      "API-Key": []
     }
   ],
   "components": {
@@ -219,6 +258,30 @@
           "json",
           "xml"
         ]
+      }
+    },
+    "NearbyTransitStops": {
+      "type": "object",
+      "required": ["TransitStopPaths"],
+      "properties": {
+        "TransitStopPaths": {
+          "type": "array",
+          "items": {
+            "$ref": "#/components/schemas/NearbyTransitStop"
+          }
+        }
+      }
+    },
+    "NearbyTransitStop": {
+      "type": "object",
+      "required": ["TransitStop", "Distance"],
+      "properties": {
+        "TransitStop": {
+          "$ref": "#/components/schemas/Stop"
+        },
+        "Distance": {
+          "type": "number"
+        }
       }
     }
   }

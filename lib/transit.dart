@@ -1,16 +1,18 @@
 import 'dart:convert' show JsonEncoder;
 
-import 'package:chopper/chopper.dart' show ChopperClient, Request;
-import 'package:timezone/standalone.dart' as tz;
-import 'package:logging/logging.dart' show Logger, Level;
+import 'package:chopper/chopper.dart'
+    show ChopperClient, ChopperService, Request;
+import 'package:intl/intl.dart';
 import 'package:logger/logger.dart' as logger;
+import 'package:logging/logging.dart' show Logger, Level;
+import 'package:timezone/standalone.dart' as tz;
 
 import 'generated_code/journey_planner.swagger.dart'
     show Format, JourneyPlanner, Stop, StopTimetableResponse, Trip;
 import 'journey_planner_service.dart' show Location, nearbyStops;
 import 'pair.dart' show Pair;
 
-var json = JsonEncoder.withIndent('  ');
+var json = const JsonEncoder.withIndent('  ');
 
 Future<void> main() async {
   await tz.initializeTimeZone();
@@ -19,20 +21,27 @@ Future<void> main() async {
   Logger.root.level = Level.ALL; // defaults to Level.INFO
   var pretty = logger.Logger();
   Logger.root.onRecord
-      .listen((record) => pretty.log(logger.Level.info, record));
+      .listen((record) => pretty.log(logger.Level.info, record.message));
 
   var location = Location(-31.951548099520902, 115.85798556027436);
 
-  print('apiKey: ' + String.fromEnvironment("API_KEY"));
-  var apiKey =
-  bool.hasEnvironment("API_KEY") ? String.fromEnvironment("API_KEY") : null;
-  var stops = await nearbyStops(apiKey!, location);
+  var apiKey = 'eac7a147-0831-4fcf-8fa8-a5e8ffcfa039';
+  var stops = await nearbyStops(apiKey, location);
+
+  JourneyPlanner client = getClient(
+      JourneyPlanner.create,
+      // "http://au-journeyplanner.silverrailtech.com/journeyplannerservice/v2/REST",
+      "http://realtime.transperth.info/SJP/StopTimetableService.svc/",
+      // apiKey
+      "ad89905f-d5a7-487f-a876-db39092c6ee0"
+  );
 
   Set<Pair<Stop, Trip>> nearbyBuses = (await Future.wait(
-      stops.map((stop) => getStopTimetable(stop.transitStop.code))))
+      stops.map((stop) => getStopTimetable(client, stop.transitStop.code))))
       .where((element) => element.trips != null)
       .expand((element) =>
-      element.trips!.map((e) => Pair.of(element.requestedStop, e)))
+      element.trips!.map((e) => Pair.of(element.requestedStop!, e)))
+      .where((element) => getRealtime(element.right.realTimeInfo) != null)
       .toSet();
 
   print(json.convert({
@@ -41,9 +50,7 @@ Future<void> main() async {
   var nearbyBus = nearbyBuses.first;
 
   var realTimeInfo = nearbyBus.right.realTimeInfo!;
-  var arrivalTime = realTimeInfo.estimatedArrivalTime == null
-      ? realTimeInfo.actualArrivalTime
-      : null;
+  String? arrivalTime = getRealtime(realTimeInfo);
 
   assert(arrivalTime != null, "Arrival time must exist");
 
@@ -56,11 +63,33 @@ Future<void> main() async {
   });
 
   createNotification(
-      nearbyBus.left.description,
-      nearbyBus.right.summary.routeCode +
+      nearbyBus.left.description!,
+      nearbyBus.right.summary!.routeCode! +
           ' ' +
-          nearbyBus.right.summary.headsign,
+          nearbyBus.right.summary!.headsign!,
       now.difference(arrivalDateTime));
+}
+
+String? getRealtime(RealTimeInfo? realTimeInfo) {
+  return realTimeInfo == null ? null : realTimeInfo.estimatedArrivalTime == null
+      ? realTimeInfo.actualArrivalTime
+      : null;
+}
+
+T getClient<T extends ChopperService>(
+    T Function() create, String baseUrl, String apiKey) {
+  var baseClient = create();
+  return ChopperClient(
+      services: [baseClient],
+      converter: baseClient.client.converter,
+      interceptors: [
+            (Request request) => Request(
+            request.method, request.url, request.baseUrl,
+            parameters: request.parameters
+              ..putIfAbsent('ApiKey', () => apiKey))
+      ],
+      baseUrl: baseUrl)
+      .getService<T>();
 }
 
 DateTime toDateTime(tz.TZDateTime now, String s) {
@@ -73,25 +102,18 @@ void createNotification(String description, String routeCode, Duration delta) {
   print({"description": description, "routeCode": routeCode, "delta": delta});
 }
 
-Future<StopTimetableResponse> getStopTimetable(String stopNumber) async {
+Future<StopTimetableResponse> getStopTimetable(
+    JourneyPlanner client, String stopNumber) async {
   var perth = tz.getLocation('Australia/Perth');
 
-  var client = ChopperClient(services: [
-    JourneyPlanner.create()
-  ], interceptors: [
-        (Request request) => Request(
-        request.method,
-        request.url + "&apiKey=ad89905f-d5a7-487f-a876-db39092c6ee0",
-        request.baseUrl)
-  ], baseUrl: "http://au-journeyplanner.silverrailtech.com/journeyplannerservice/v2/REST")
-      .getService<JourneyPlanner>();
+  var time = DateFormat('yyyy-MM-ddTHH:mm').format(tz.TZDateTime.now(perth));
 
   return (await client.dataSetsDatasetStopTimetableGet(
       dataset: 'PerthRestricted',
       stopUID: "PerthRestricted:$stopNumber",
       isRealTimeChecked: true,
       returnNotes: true,
-      time: tz.TZDateTime.now(perth).toIso8601String(),
+      time: time,
       format: Format.json))
       .body!;
 }
