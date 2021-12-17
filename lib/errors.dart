@@ -3,7 +3,7 @@ import 'package:logging/logging.dart' show Logger;
 import 'package:transit_dashboard/generated_code/journey_planner.swagger.dart'
     show Error;
 
-var logger = Logger("errors");
+var logger = Logger("errors.dart");
 
 T errorOrResult<T extends Error>(Response<T> res) {
   var status = res.body!.status!;

@@ -5,10 +5,10 @@ import 'dart:convert' show JsonEncoder;
 import 'package:chopper/chopper.dart'
     show ChopperClient, ChopperService, Request;
 import 'package:intl/intl.dart';
-import 'package:logger/logger.dart' as logger;
-import 'package:logging/logging.dart' show Logger, Level;
+import 'package:logging/logging.dart' show Logger;
 import 'package:timezone/standalone.dart' as tz;
 import 'package:transit_dashboard/errors.dart' show errorOrResult;
+import 'package:transit_dashboard/loggers.dart' show setupLogging;
 
 import 'generated_code/journey_planner.swagger.dart'
     show
@@ -22,20 +22,18 @@ import 'journey_planner_service.dart' show Location, nearbyStops;
 import 'pair.dart' show Pair;
 
 var json = const JsonEncoder.withIndent('  ');
+var logger = Logger('transit.dart');
 
 Future<void> main() async {
   await tz.initializeTimeZone();
   var perth = tz.getLocation('Australia/Perth');
-
-  Logger.root.level = Level.ALL; // defaults to Level.INFO
-  var pretty = logger.Logger();
-  Logger.root.onRecord
-      .listen((record) => pretty.log(logger.Level.info, record.message));
+  setupLogging();
 
   var location = Location(-31.951548099520902, 115.85798556027436);
 
   var apiKey = 'eac7a147-0831-4fcf-8fa8-a5e8ffcfa039';
   var stops = await nearbyStops(apiKey, location);
+  logger.info('stops: ${stops.length}');
 
   JourneyPlanner client = getClient(
       JourneyPlanner.create,
