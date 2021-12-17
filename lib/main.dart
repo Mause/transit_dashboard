@@ -1,3 +1,4 @@
+import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart'
     show GeolocatorPlatform, LocationPermission, LocationSettings;
@@ -6,7 +7,27 @@ import 'package:get/get.dart'
 import 'package:transit_dashboard/journey_planner_service.dart'
     show Location, nearbyStops;
 
+var awesomeNotifications = AwesomeNotifications();
+
 void main() {
+  awesomeNotifications.initialize(
+      // set the icon to null if you want to use the default app icon
+      'resource://drawable/res_app_icon',
+      [
+        NotificationChannel(
+            channelGroupKey: 'basic_channel_group',
+            channelKey: 'basic_channel',
+            channelName: 'Basic notifications',
+            channelDescription: 'Notification channel for basic tests',
+            defaultColor: const Color(0xFF9D50DD),
+            ledColor: Colors.white)
+      ],
+      channelGroups: [
+        NotificationChannelGroup(
+            channelGroupkey: 'basic_channel_group',
+            channelGroupName: 'Basic group')
+      ],
+      debug: true);
   runApp(const MyApp());
 }
 
@@ -129,6 +150,14 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> loadStops() async {
+    var isAllowed = await awesomeNotifications.isNotificationAllowed();
+    if (!isAllowed) {
+      // This is just a basic example. For real apps, you must show some
+      // friendly dialog box before call the request method.
+      // This is very important to not harm the user experience
+      await awesomeNotifications.requestPermissionToSendNotifications();
+    }
+
     var locationPermission =
         await GeolocatorPlatform.instance.requestPermission();
     if (locationPermission == LocationPermission.always ||
@@ -140,7 +169,7 @@ class _MyHomePageState extends State<MyHomePage> {
       var stops = await nearbyStops('eac7a147-0831-4fcf-8fa8-a5e8ffcfa039',
           Location(loco.latitude, loco.longitude));
 
-      Get.defaultDialog(
+      await Get.defaultDialog(
           title: 'Stops',
           content: ListView(
               children: stops
@@ -149,6 +178,13 @@ class _MyHomePageState extends State<MyHomePage> {
                       subtitle: Text(
                           '${e.transitStop!.code} - ${e.distance} metres away')))
                   .toList()));
+
+      awesomeNotifications.createNotification(
+          content: NotificationContent(
+              id: 10,
+              channelKey: 'basic_channel',
+              title: 'Simple Notification',
+              body: 'Simple body'));
     } else {
       throw Exception(locationPermission.toString());
     }
