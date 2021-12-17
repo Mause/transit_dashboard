@@ -88,11 +88,13 @@ Future<void> main() async {
 }
 
 String? getRealtime(RealTimeInfo? realTimeInfo) {
-  return realTimeInfo == null
-      ? null
-      : realTimeInfo.estimatedArrivalTime == null
-          ? realTimeInfo.actualArrivalTime
-          : null;
+  if (realTimeInfo == null) {
+    return null;
+  } else if (realTimeInfo.estimatedArrivalTime != null) {
+    return realTimeInfo.estimatedArrivalTime;
+  } else {
+    return realTimeInfo.actualArrivalTime;
+  }
 }
 
 T getClient<T extends ChopperService>(
