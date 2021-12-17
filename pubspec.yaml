@@ -34,12 +34,13 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
 
-  json_annotation: ^4.1.0
+  json_annotation: any
   logger: ^1.1.0
   logging: ^1.0.2
   sentry: ^6.2.1
   timezone: ^0.8.0
   chopper: ^4.0.1
+  intl: ^0.17.0
   # awesome_notifications: ^0.6.19
 
 dev_dependencies:
@@ -53,8 +54,8 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^1.0.0
 
-  build_runner: 2.0.1
-  json_serializable: ^4.1.4
+  build_runner: any
+  json_serializable: any
   test: '>=1.15.0 <2.0.0'
   chopper_generator: any
   swagger_dart_code_generator: any
