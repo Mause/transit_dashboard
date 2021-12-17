@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 import 'package:logger/logger.dart' as logger;
 import 'package:logging/logging.dart' show Logger, Level;
 import 'package:timezone/standalone.dart' as tz;
+import 'package:transit_dashboard/errors.dart' show errorOrResult;
 
 import 'generated_code/journey_planner.swagger.dart'
     show
@@ -117,12 +118,11 @@ Future<StopTimetableResponse> getStopTimetable(
 
   var time = DateFormat('yyyy-MM-ddTHH:mm').format(tz.TZDateTime.now(perth));
 
-  return (await client.dataSetsDatasetStopTimetableGet(
-          dataset: 'PerthRestricted',
-          stopUID: "PerthRestricted:$stopNumber",
-          isRealTimeChecked: true,
-          returnNotes: true,
-          time: time,
-          format: Format.json))
-      .body!;
+  return errorOrResult(await client.dataSetsDatasetStopTimetableGet(
+      dataset: 'PerthRestricted',
+      stopUID: "PerthRestricted:$stopNumber",
+      isRealTimeChecked: true,
+      returnNotes: true,
+      time: time,
+      format: Format.json));
 }
