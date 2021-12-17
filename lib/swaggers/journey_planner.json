@@ -224,11 +224,11 @@
       "RealTimeInfo": {
         "type": "object",
         "properties": {
-          "estimatedArrivalTime": {
+          "EstimatedArrivalTime": {
             "type": "string",
             "format": "time"
           },
-          "actualArrivalTime": {
+          "ActualArrivalTime": {
             "type": "string",
             "format": "time"
           }
