@@ -150,24 +150,31 @@
         }
       },
       "StopTimetableResponse": {
-        "type": "object",
-        "required": [
-          "Status"
-        ],
-        "properties": {
-          "Status": {
-            "$ref": "#/components/schemas/StatusResponse"
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Error"
           },
-          "Trips": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Trip"
+          {
+            "type": "object",
+            "required": [
+              "Status"
+            ],
+            "properties": {
+              "Status": {
+                "$ref": "#/components/schemas/StatusResponse"
+              },
+              "Trips": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/Trip"
+                }
+              },
+              "RequestedStop": {
+                "$ref": "#/components/schemas/Stop"
+              }
             }
-          },
-          "RequestedStop": {
-            "$ref": "#/components/schemas/Stop"
           }
-        }
+        ]
       },
       "Stop": {
         "type": "object",
@@ -267,18 +274,25 @@
         ]
       },
       "NearbyTransitStops": {
-        "type": "object",
-        "required": [
-          "TransitStopPaths"
-        ],
-        "properties": {
-          "TransitStopPaths": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/NearbyTransitStop"
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Error"
+          },
+          {
+            "type": "object",
+            "required": [
+              "TransitStopPaths"
+            ],
+            "properties": {
+              "TransitStopPaths": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/NearbyTransitStop"
+                }
+              }
             }
           }
-        }
+        ]
       },
       "NearbyTransitStop": {
         "type": "object",
