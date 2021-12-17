@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'dart:convert' show JsonEncoder;
 
 import 'package:chopper/chopper.dart'
