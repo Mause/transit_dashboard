@@ -23,27 +23,3 @@ T errorOrResult<T>(
 
   return fromJson(body);
 }
-
-@JsonSerializable()
-class Status {
-  int severity;
-  List<Detail> details;
-
-  Status(this.severity, this.details);
-
-  factory Status.fromJson(Map<String, dynamic> json) => _$StatusFromJson(json);
-
-  Map<String, dynamic> toJson() => _$StatusToJson(this);
-}
-
-@JsonSerializable()
-class Detail {
-  int code;
-  String message;
-
-  Detail(this.code, this.message);
-
-  factory Detail.fromJson(Map<String, dynamic> json) => _$DetailFromJson(json);
-
-  Map<String, dynamic> toJson() => _$DetailToJson(this);
-}
