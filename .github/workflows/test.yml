@@ -13,6 +13,16 @@ jobs:
           pipenv install
       - run: pipenv run python main.py
 
+  swagger_validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Validate OpenAPI definition
+        uses: char0n/swagger-editor-validate@v1
+        with:
+          definition-file: lib/swaggers/journey_planner.json
+
   flutter:
     runs-on: ubuntu-latest
     container: cirrusci/flutter:beta
