@@ -10,7 +10,13 @@ import 'package:logging/logging.dart' show Logger, Level;
 import 'package:timezone/standalone.dart' as tz;
 
 import 'generated_code/journey_planner.swagger.dart'
-    show Format, JourneyPlanner, RealTimeInfo, Stop, StopTimetableResponse, Trip;
+    show
+        Format,
+        JourneyPlanner,
+        RealTimeInfo,
+        Stop,
+        StopTimetableResponse,
+        Trip;
 import 'journey_planner_service.dart' show Location, nearbyStops;
 import 'pair.dart' show Pair;
 
@@ -35,14 +41,13 @@ Future<void> main() async {
       // "http://au-journeyplanner.silverrailtech.com/journeyplannerservice/v2/REST",
       "http://realtime.transperth.info/SJP/StopTimetableService.svc/",
       // apiKey
-      "ad89905f-d5a7-487f-a876-db39092c6ee0"
-  );
+      "ad89905f-d5a7-487f-a876-db39092c6ee0");
 
-  Set<Pair<Stop, Trip>> nearbyBuses = (await Future.wait(
-      stops.map((stop) => getStopTimetable(client, stop.transitStop.code))))
+  Set<Pair<Stop, Trip>> nearbyBuses = (await Future.wait(stops
+          .map((stop) => getStopTimetable(client, stop.transitStop!.code!))))
       .where((element) => element.trips != null)
       .expand((element) =>
-      element.trips!.map((e) => Pair.of(element.requestedStop!, e)))
+          element.trips!.map((e) => Pair.of(element.requestedStop!, e)))
       .where((element) => getRealtime(element.right.realTimeInfo) != null)
       .toSet();
 
@@ -73,24 +78,26 @@ Future<void> main() async {
 }
 
 String? getRealtime(RealTimeInfo? realTimeInfo) {
-  return realTimeInfo == null ? null : realTimeInfo.estimatedArrivalTime == null
-      ? realTimeInfo.actualArrivalTime
-      : null;
+  return realTimeInfo == null
+      ? null
+      : realTimeInfo.estimatedArrivalTime == null
+          ? realTimeInfo.actualArrivalTime
+          : null;
 }
 
 T getClient<T extends ChopperService>(
     T Function() create, String baseUrl, String apiKey) {
   var baseClient = create();
   return ChopperClient(
-      services: [baseClient],
-      converter: baseClient.client.converter,
-      interceptors: [
+          services: [baseClient],
+          converter: baseClient.client.converter,
+          interceptors: [
             (Request request) => Request(
-            request.method, request.url, request.baseUrl,
-            parameters: request.parameters
-              ..putIfAbsent('ApiKey', () => apiKey))
-      ],
-      baseUrl: baseUrl)
+                request.method, request.url, request.baseUrl,
+                parameters: request.parameters
+                  ..putIfAbsent('ApiKey', () => apiKey))
+          ],
+          baseUrl: baseUrl)
       .getService<T>();
 }
 
@@ -111,11 +118,11 @@ Future<StopTimetableResponse> getStopTimetable(
   var time = DateFormat('yyyy-MM-ddTHH:mm').format(tz.TZDateTime.now(perth));
 
   return (await client.dataSetsDatasetStopTimetableGet(
-      dataset: 'PerthRestricted',
-      stopUID: "PerthRestricted:$stopNumber",
-      isRealTimeChecked: true,
-      returnNotes: true,
-      time: time,
-      format: Format.json))
+          dataset: 'PerthRestricted',
+          stopUID: "PerthRestricted:$stopNumber",
+          isRealTimeChecked: true,
+          returnNotes: true,
+          time: time,
+          format: Format.json))
       .body!;
 }

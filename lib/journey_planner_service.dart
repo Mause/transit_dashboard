@@ -1,8 +1,9 @@
-import 'generated_code/journey_planner.swagger.dart' show JourneyPlanner, Format, NearbyTransitStop;
+import 'generated_code/journey_planner.swagger.dart'
+    show JourneyPlanner, Format, NearbyTransitStop;
 import 'transit.dart' show getClient;
 
-Future<List<NearbyTransitStop>> nearbyStops(String apikey,
-    Location location) async {
+Future<List<NearbyTransitStop>> nearbyStops(
+    String apikey, Location location) async {
   // var res = await client.get(Uri.http(
   //     "au-journeyplanner.silverrailtech.com",
   //     "journeyplannerservice/v2/REST/Datasets/PerthRestricted/NearbyTransitStops",
@@ -17,13 +18,14 @@ Future<List<NearbyTransitStop>> nearbyStops(String apikey,
   JourneyPlanner client = getClient(
       JourneyPlanner.create,
       "http://au-journeyplanner.silverrailtech.com/journeyplannerservice/v2/REST",
-      apikey
-  );
+      apikey);
 
   return (await client.dataSetsDatasetNearbyTransitStopsGet(
-      dataset: 'PerthRestricted',
-      format: Format.json,
-      geoCoordinate: "${location.latitude},${location.longitude}")).body;
+          dataset: 'PerthRestricted',
+          format: Format.json,
+          geoCoordinate: "${location.latitude},${location.longitude}"))
+      .body!
+      .transitStopPaths!;
 }
 
 class Location {
