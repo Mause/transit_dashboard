@@ -48,7 +48,7 @@ jobs:
 
       - run: mv build/app/outputs/flutter-apk/app-release.apk me.mause.transit_dashboard-1.0.0+${{ github.run_number }}.apk
 
-      - uses: actions/upload-artifacts@v2
+      - uses: actions/upload-artifact@v2
         with:
           name: apk
           path: '*.apk'
