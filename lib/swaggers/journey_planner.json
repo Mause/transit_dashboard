@@ -172,10 +172,14 @@
       "Stop": {
         "type": "object",
         "required": [
-          "Description"
+          "Description",
+          "Code"
         ],
         "properties": {
           "Description": {
+            "type": "string"
+          },
+          "Code": {
             "type": "string"
           }
         }
