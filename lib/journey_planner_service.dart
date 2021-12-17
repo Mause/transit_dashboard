@@ -1,7 +1,4 @@
-import 'package:json_annotation/json_annotation.dart'
-    show JsonSerializable, $checkedNew, $checkedConvert;
-
-import 'generated_code/journey_planner.swagger.dart' show JourneyPlanner, Format;
+import 'generated_code/journey_planner.swagger.dart' show JourneyPlanner, Format, NearbyTransitStop;
 import 'transit.dart' show getClient;
 
 Future<List<NearbyTransitStop>> nearbyStops(String apikey,

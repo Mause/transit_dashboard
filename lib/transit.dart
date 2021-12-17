@@ -8,7 +8,7 @@ import 'package:logging/logging.dart' show Logger, Level;
 import 'package:timezone/standalone.dart' as tz;
 
 import 'generated_code/journey_planner.swagger.dart'
-    show Format, JourneyPlanner, Stop, StopTimetableResponse, Trip;
+    show Format, JourneyPlanner, RealTimeInfo, Stop, StopTimetableResponse, Trip;
 import 'journey_planner_service.dart' show Location, nearbyStops;
 import 'pair.dart' show Pair;
 
