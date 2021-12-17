@@ -54,7 +54,7 @@ dev_dependencies:
   flutter_lints: ^1.0.0
 
   build_runner: 2.0.1
-  json_serializable: ^4.1.4
+  json_serializable: ^6.0.0
   test: '>=1.15.0 <2.0.0'
   chopper_generator: any
   swagger_dart_code_generator: any
