@@ -1,4 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart'
+    show GeolocatorPlatform, LocationPermission, LocationSettings;
+import 'package:get/get.dart' show Get, GetMaterialApp, ExtensionDialog;
+import 'package:transit_dashboard/journey_planner_service.dart'
+    show Location, nearbyStops;
 
 void main() {
   runApp(const MyApp());
@@ -10,8 +15,8 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
+    return GetMaterialApp(
+      title: 'Transit Dashboard',
       theme: ThemeData(
         // This is the theme of your application.
         //
@@ -95,6 +100,33 @@ class _MyHomePageState extends State<MyHomePage> {
           // horizontal).
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
+            MaterialButton(
+                child: const Text('Load stops'),
+                onPressed: () async {
+                  var locationPermission =
+                      await GeolocatorPlatform.instance.requestPermission();
+                  if (locationPermission == LocationPermission.always ||
+                      locationPermission == LocationPermission.whileInUse) {
+                    var loco = await GeolocatorPlatform.instance
+                        .getCurrentPosition(
+                            locationSettings: const LocationSettings(
+                                timeLimit: Duration(seconds: 30)));
+
+                    var stops = await nearbyStops(
+                        'eac7a147-0831-4fcf-8fa8-a5e8ffcfa039',
+                        Location(loco.latitude, loco.longitude));
+
+                    Get.defaultDialog(
+                        title: 'Stops',
+                        content: ListView(
+                            children: stops
+                                .map((e) => ListTile(
+                                    title: Text(e.transitStop!.description!),
+                                    subtitle: Text(
+                                        '${e.transitStop!.code} - ${e.distance} metres away')))
+                                .toList()));
+                  }
+                }),
             const Text(
               'You have pushed the button this many times:',
             ),

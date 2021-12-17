@@ -41,6 +41,8 @@ dependencies:
   timezone: ^0.8.0
   chopper: ^4.0.1
   intl: ^0.17.0
+  geolocator: ^8.0.1
+  get: ^4.6.1
   # awesome_notifications: ^0.6.19
 
 dev_dependencies:
