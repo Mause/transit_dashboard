@@ -3,7 +3,8 @@ import 'package:logging/logging.dart' show Logger, Level;
 
 void setupLogging() {
   Logger.root.level = Level.ALL; // defaults to Level.INFO
-  var pretty = logger.Logger();
+  var pretty = logger.Logger(
+      filter: logger.ProductionFilter(), level: logger.Level.verbose);
   Logger.root.onRecord.listen((record) {
     logger.Level level;
     if (record.level == Level.INFO) {
