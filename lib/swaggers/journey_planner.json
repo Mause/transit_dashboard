@@ -1,5 +1,5 @@
 {
-  "openapi": "3.1.0",
+  "openapi": "3.0.0",
   "info": {
     "title": "Journey Planner",
     "version": "0.0.1",
@@ -41,7 +41,9 @@
             "description": "OK",
             "content": {
               "application/json": {
-                "$ref": "#/components/schemas/NearbyTransitStops"
+                "schema": {
+                  "$ref": "#/components/schemas/NearbyTransitStops"
+                }
               }
             }
           }
@@ -114,22 +116,20 @@
       }
     }
   },
-  "responses": {
-    "400": {
-      "description": "Request error",
-      "$ref": "#/components/schemas/Error"
-    },
-    "401": {
-      "description": "Auth error",
-      "$ref": "#/components/schemas/Error"
-    }
-  },
   "security": [
     {
-      "API-Key": []
+      "ApiKey": []
     }
   ],
   "components": {
+    "responses": {
+      "400": {
+        "$ref": "#/components/schemas/Error"
+      },
+      "401": {
+        "$ref": "#/components/schemas/Error"
+      }
+    },
     "securitySchemes": {
       "ApiKey": {
         "type": "apiKey",
@@ -140,7 +140,9 @@
     "schemas": {
       "Error": {
         "type": "object",
-        "required": ["Status"],
+        "required": [
+          "Status"
+        ],
         "properties": {
           "Status": {
             "$ref": "#/components/schemas/StatusResponse"
@@ -259,29 +261,34 @@
           "json",
           "xml"
         ]
-      }
-    },
-    "NearbyTransitStops": {
-      "type": "object",
-      "required": ["TransitStopPaths"],
-      "properties": {
-        "TransitStopPaths": {
-          "type": "array",
-          "items": {
-            "$ref": "#/components/schemas/NearbyTransitStop"
+      },
+      "NearbyTransitStops": {
+        "type": "object",
+        "required": [
+          "TransitStopPaths"
+        ],
+        "properties": {
+          "TransitStopPaths": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/NearbyTransitStop"
+            }
           }
         }
-      }
-    },
-    "NearbyTransitStop": {
-      "type": "object",
-      "required": ["TransitStop", "Distance"],
-      "properties": {
-        "TransitStop": {
-          "$ref": "#/components/schemas/Stop"
-        },
-        "Distance": {
-          "type": "number"
+      },
+      "NearbyTransitStop": {
+        "type": "object",
+        "required": [
+          "TransitStop",
+          "Distance"
+        ],
+        "properties": {
+          "TransitStop": {
+            "$ref": "#/components/schemas/Stop"
+          },
+          "Distance": {
+            "type": "number"
+          }
         }
       }
     }
