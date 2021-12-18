@@ -180,15 +180,14 @@ class _MyHomePageState extends State<MyHomePage> {
                   .toList()));
 
       var title = '960 to Perth Underground Busport';
+      var update = (text) => await awesomeNotifications.createNotification(
+          content: NotificationContent(
+              id: 10, channelKey: 'basic_channel', title: title, body: text));
       for (var i in Iterable.generate(10)) {
-        await awesomeNotifications.createNotification(
-            content: NotificationContent(
-                id: 10,
-                channelKey: 'basic_channel',
-                title: title,
-                body: '${10 - i} minutes away'));
+        await update('${10 - i} minutes away');
         await Future.delayed(const Duration(seconds: 3));
       }
+      await update('Departed');
     } else {
       throw Exception(locationPermission.toString());
     }
