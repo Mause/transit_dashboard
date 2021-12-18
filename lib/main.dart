@@ -187,7 +187,7 @@ class _MyHomePageState extends State<MyHomePage> {
               channelKey: 'basic_channel',
               title: title,
               body: '${10 - i} minutes away'));
-        await Future.delayed(Duration(seconds: 3));
+        await Future.delayed(const Duration(seconds: 3));
       }
     } else {
       throw Exception(locationPermission.toString());
