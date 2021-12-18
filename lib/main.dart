@@ -12,7 +12,7 @@ var awesomeNotifications = AwesomeNotifications();
 void main() {
   awesomeNotifications.initialize(
       // set the icon to null if you want to use the default app icon
-      'resource://drawable/res_app_icon',
+      null,
       [
         NotificationChannel(
             channelGroupKey: 'basic_channel_group',
