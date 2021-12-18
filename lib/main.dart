@@ -179,12 +179,16 @@ class _MyHomePageState extends State<MyHomePage> {
                           '${e.transitStop!.code} - ${e.distance} metres away')))
                   .toList()));
 
-      awesomeNotifications.createNotification(
-          content: NotificationContent(
-              id: 10,
-              channelKey: 'basic_channel',
-              title: 'Simple Notification',
-              body: 'Simple body'));
+      var title = '960 to Perth Underground Busport';
+      for (var i in Iterable.generate(10)) {
+        await awesomeNotifications.createNotification(
+            content: NotificationContent(
+                id: 10,
+                channelKey: 'basic_channel',
+                title: title,
+                body: '${10 - i} minutes away'));
+        await Future.delayed(const Duration(seconds: 3));
+      }
     } else {
       throw Exception(locationPermission.toString());
     }

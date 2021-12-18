@@ -42,11 +42,14 @@ def main():
     print("current_time:", datetime.now(tz=perth))
     print("server_time:", server_time)
 
-    pprint(trips[0])
+    if trips:
+        pprint(trips[0])
 
-    trip = trips[0]
+        trip = trips[0]
 
-    analyse_trip(server_time, trip)
+        analyse_trip(server_time, trip)
+    else:
+        print("no trips found")
 
 
 def analyse_trip(server_time, trip):
