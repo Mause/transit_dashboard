@@ -321,7 +321,7 @@
               "type": "object",
               "properties": {
                   "Summary": {
-                    "$ref": "#/components/schemas/Summary"
+                    "$ref": "#/components/schemas/TripSummary"
                   }
               }
             }
