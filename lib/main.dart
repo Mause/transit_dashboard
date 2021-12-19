@@ -1,16 +1,27 @@
-import 'package:awesome_notifications/awesome_notifications.dart';
+import 'package:awesome_notifications/awesome_notifications.dart'
+    show
+        AwesomeNotifications,
+        NotificationChannel,
+        NotificationChannelGroup,
+        NotificationContent;
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart'
     show GeolocatorPlatform, LocationPermission, LocationSettings;
 import 'package:get/get.dart'
     show Get, GetMaterialApp, ExtensionDialog, ExtensionSnackbar;
+import 'package:timezone/standalone.dart'
+    show TZDateTime, getLocation, initializeTimeZone;
 import 'package:transit_dashboard/journey_planner_service.dart'
     show Location, nearbyStops;
 
+import 'generated_code/journey_planner.swagger.dart' show JourneyPlanner;
+import 'transit.dart' show getClient, getRealtime, getStopTimetable, toDateTime;
+
 var awesomeNotifications = AwesomeNotifications();
 
-void main() {
-  awesomeNotifications.initialize(
+void main() async {
+  await initializeTimeZone();
+  await awesomeNotifications.initialize(
       // set the icon to null if you want to use the default app icon
       null,
       [
@@ -76,6 +87,14 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
+  late JourneyPlanner client;
+
+  _MyHomePageState() {
+    client = getClient(
+        JourneyPlanner.create,
+        "http://realtime.transperth.info/SJP/StopTimetableService.svc/",
+        "ad89905f-d5a7-487f-a876-db39092c6ee0");
+  }
 
   void _incrementCounter() {
     setState(() {
@@ -179,17 +198,34 @@ class _MyHomePageState extends State<MyHomePage> {
                           '${e.transitStop!.code} - ${e.distance} metres away')))
                   .toList()));
 
-      var title = '960 to Perth Underground Busport';
-      update(text) async => await awesomeNotifications.createNotification(
-          content: NotificationContent(
-              id: 10, channelKey: 'basic_channel', title: title, body: text));
-      for (var i in Iterable.generate(10)) {
-        await update('${10 - i} minutes away');
+      var stopCode = stops[0].transitStop!.code!;
+
+      var response = await getStopTimetable(client, stopCode);
+      var trip = response.trips![0];
+
+      var title = '${trip.summary!.routeCode} to ${trip.summary!.headsign}';
+
+      if (getRealtime(trip.realTimeInfo) == null) {
+        await update(title, 'No realtime information available');
+        return;
+      }
+
+      for (var _ in Iterable.generate(10)) {
+        // for now, we're assuming the realtime doesn't change
+        var now = TZDateTime.now(getLocation('Australia/Perth'));
+        var delta =
+            now.difference(toDateTime(now, getRealtime(trip.realTimeInfo)!));
+
+        await update(title, '${delta.inMinutes} minutes away');
         await Future.delayed(const Duration(seconds: 3));
       }
-      await update('Departed');
+      await update(title, 'Departed');
     } else {
       throw Exception(locationPermission.toString());
     }
   }
 }
+
+update(title, text) async => await awesomeNotifications.createNotification(
+    content: NotificationContent(
+        id: 10, channelKey: 'basic_channel', title: title, body: text));
