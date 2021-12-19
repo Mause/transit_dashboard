@@ -180,7 +180,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   .toList()));
 
       var title = '960 to Perth Underground Busport';
-      var update = (text) => await awesomeNotifications.createNotification(
+      update(text) async => await awesomeNotifications.createNotification(
           content: NotificationContent(
               id: 10, channelKey: 'basic_channel', title: title, body: text));
       for (var i in Iterable.generate(10)) {
