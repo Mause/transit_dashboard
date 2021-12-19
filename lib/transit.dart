@@ -131,7 +131,7 @@ Future<StopTimetableResponse> getStopTimetable(
 
   return errorOrResult(await client.dataSetsDatasetStopTimetableGet(
       dataset: 'PerthRestricted',
-      stopUID: "PerthRestricted:$stopNumber",
+      stop: "PerthRestricted:$stopNumber",
       isRealTimeChecked: true,
       returnNotes: true,
       time: time,

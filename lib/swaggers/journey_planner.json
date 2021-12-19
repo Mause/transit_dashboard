@@ -63,7 +63,7 @@
             }
           },
           {
-            "name": "StopUID",
+            "name": "Stop",
             "in": "query",
             "required": true,
             "schema": {
