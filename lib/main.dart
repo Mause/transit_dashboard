@@ -89,6 +89,9 @@ class _MyHomePageState extends State<MyHomePage> {
   int _counter = 0;
   late JourneyPlanner client;
 
+  String? routeNumber;
+  String? stopNumber;
+
   _MyHomePageState() {
     client = getClient(
         JourneyPlanner.create,
@@ -157,6 +160,8 @@ class _MyHomePageState extends State<MyHomePage> {
               '$_counter',
               style: Theme.of(context).textTheme.headline4,
             ),
+            Text('Selected stop: $stopNumber'),
+            Text('Selected route: $routeNumber'),
           ],
         ),
       ),
@@ -200,12 +205,19 @@ class _MyHomePageState extends State<MyHomePage> {
                   .toList()));
       */
 
-      var stopCode = stops[0].transitStop!.code!;
+      var stopNumber = stops[0].transitStop!.code!;
+      setState(() {
+        this.stopNumber = stopNumber;
+      });
 
-      var response = await getStopTimetable(client, stopCode);
+      var response = await getStopTimetable(client, stopNumber);
       var trip = response.trips![0];
 
-      var title = '${trip.summary!.routeCode} to ${trip.summary!.headsign}';
+      setState(() {
+        routeNumber = trip.summary!.routeCode;
+      });
+
+      var title = '$routeNumber to ${trip.summary!.headsign}';
 
       if (getRealtime(trip.realTimeInfo) == null) {
         await update(title, 'No realtime information available');
