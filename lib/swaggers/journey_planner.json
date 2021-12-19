@@ -319,8 +319,10 @@
             "type": "array",
             "items": {
               "type": "object",
-              "Summary": {
-                "$ref": "#/components/schemas/Summary"
+              "properties": {
+                  "Summary": {
+                    "$ref": "#/components/schemas/Summary"
+                  }
               }
             }
           }
