@@ -34,6 +34,14 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "Time",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "date-time"
+            }
           }
         ],
         "responses": {
@@ -306,6 +314,15 @@
           },
           "Distance": {
             "type": "number"
+          },
+          "Trips": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "Summary": {
+                "$ref": "#/components/schemas/Summary"
+              }
+            }
           }
         }
       }
