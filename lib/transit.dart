@@ -125,9 +125,7 @@ void createNotification(String description, String routeCode, Duration delta) {
 
 Future<StopTimetableResponse> getStopTimetable(
     JourneyPlanner client, String stopNumber) async {
-  var perth = tz.getLocation('Australia/Perth');
-
-  var time = DateFormat('yyyy-MM-ddTHH:mm').format(tz.TZDateTime.now(perth));
+  var time = getNowAsString();
 
   return errorOrResult(await client.dataSetsDatasetStopTimetableGet(
       dataset: 'PerthRestricted',
@@ -137,3 +135,5 @@ Future<StopTimetableResponse> getStopTimetable(
       time: time,
       format: Format.json));
 }
+
+String getNowAsString() => DateFormat('yyyy-MM-ddTHH:mm').format(tz.TZDateTime.now(tz.getLocation('Australia/Perth')));
