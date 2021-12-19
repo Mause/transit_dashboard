@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.transit_dashboard">
+    package="me.mause.transit_dashboard">
    <application
         android:label="transit_dashboard"
         android:name="${applicationName}"
