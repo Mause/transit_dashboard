@@ -8,7 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart'
     show GeolocatorPlatform, LocationPermission, LocationSettings;
 import 'package:get/get.dart'
-    show Get, GetMaterialApp, ExtensionDialog, ExtensionSnackbar;
+    show Get, GetMaterialApp, /*ExtensionDialog,*/ ExtensionSnackbar;
 import 'package:timezone/standalone.dart'
     show TZDateTime, getLocation, initializeTimeZone;
 import 'package:transit_dashboard/journey_planner_service.dart'
@@ -188,6 +188,7 @@ class _MyHomePageState extends State<MyHomePage> {
       var stops = await nearbyStops('eac7a147-0831-4fcf-8fa8-a5e8ffcfa039',
           Location(loco.latitude, loco.longitude));
 
+      /*
       await Get.defaultDialog(
           title: 'Stops',
           content: ListView(
@@ -197,6 +198,7 @@ class _MyHomePageState extends State<MyHomePage> {
                       subtitle: Text(
                           '${e.transitStop!.code} - ${e.distance} metres away')))
                   .toList()));
+      */
 
       var stopCode = stops[0].transitStop!.code!;
 
