@@ -261,7 +261,7 @@ class _MyHomePageState extends State<MyHomePage> {
     var strung = delta
         .toString()
         .split(':')
-        .map((part) => int.parse(part, radix: 10))
+        .map((part) => double.parse(part, radix: 10))
         .toList();
 
     return '${strung[1]} minutes, ${strung[2]} seconds';
