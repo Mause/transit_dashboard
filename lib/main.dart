@@ -226,25 +226,29 @@ class _MyHomePageState extends State<MyHomePage> {
 
       var title = '$routeNumber to ${trip.summary!.headsign}';
 
-      if (getRealtime(trip.realTimeInfo) == null) {
-        await update(title, 'No realtime information available');
-        return;
-      }
-
       while (true) {
-        // for now, we're assuming the realtime doesn't change
         var now = TZDateTime.now(getLocation('Australia/Perth'));
-        var dateTime = toDateTime(now, getRealtime(trip.realTimeInfo)!);
-        var delta = dateTime.difference(now);
-        String howLate = 'Lateness unknown';
-        if (trip.arriveTime != null) {
-          howLate =
-              humanDiff(toDateTime(now, trip.arriveTime!).difference(now));
-        }
 
+        var content = [];
+
+        // for now, we're assuming the realtime doesn't change
+        var realtime = getRealtime(now, trip.realTimeInfo);
+        var scheduled = toDateTime(now, trip.arriveTime!);
+        var datetime = realtime ?? scheduled;
+
+        var delta = datetime.difference(now);
         if (delta < Duration.zero) break;
 
-        await update(title, humanDiff(delta) + 'away\n\nRunning $howLate late');
+        content.add(humanDiff(delta) + 'away');
+        if (realtime != null) {
+          var howLate = scheduled.difference(realtime);
+          content.add('Running ${humanDiff(howLate)} late');
+        } else {
+          content.add(
+              'Realtime information is not available. Using scheduled time');
+        }
+
+        await update(title, content.join('\n\n'));
         await Future.delayed(const Duration(seconds: 3));
       }
       await update(title, 'Departed');
