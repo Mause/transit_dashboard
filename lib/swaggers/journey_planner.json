@@ -318,7 +318,7 @@
           "Trips": {
             "type": "array",
             "items": {
-              "$ref": "#/components/Trip"
+              "$ref": "#/components/schemas/Trip"
             }
           }
         }
