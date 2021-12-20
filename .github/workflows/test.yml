@@ -45,7 +45,11 @@ jobs:
 
       - run: dart run --define=API_KEY=${{ secrets.API_KEY }} bin/transit_dashboard.dart
 
-      - run: flutter build apk --dart-define=API_KEY=${{ secrets.API_KEY }} --build-number ${{ github.run_number }}
+      - run: |
+          flutter build apk \
+            --dart-define=API_KEY=${{ secrets.API_KEY }} \
+            --dart-define=SENTRY_DSN=${{ secrets.SENTRY_DSN }} \
+            --build-number ${{ github.run_number }}
 
       - name: Verify formatting
         run: flutter format --output=none --set-exit-if-changed .

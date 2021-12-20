@@ -10,6 +10,7 @@ import 'package:geolocator/geolocator.dart'
 import 'package:get/get.dart'
     show Get, GetMaterialApp, /*ExtensionDialog,*/ ExtensionSnackbar;
 import 'package:logging/logging.dart';
+import 'package:sentry_flutter/sentry_flutter.dart' show SentryFlutter;
 import 'package:timezone/data/latest.dart' show initializeTimeZones;
 import 'package:timezone/standalone.dart' show TZDateTime, getLocation;
 import 'package:transit_dashboard/journey_planner_service.dart'
@@ -19,8 +20,22 @@ import 'generated_code/journey_planner.swagger.dart' show JourneyPlanner;
 import 'transit.dart' show getClient, getRealtime, toDateTime;
 
 var awesomeNotifications = AwesomeNotifications();
+var logger = Logger('main.dart');
 
 void main() async {
+  const sentryDsn = String.fromEnvironment('SENTRY_DSN');
+  if (sentryDsn.isEmpty) {
+    await SentryFlutter.init((options) {
+      options.dsn = sentryDsn;
+      options.tracesSampleRate = 1.0;
+    }, appRunner: _main);
+  } else {
+    logger.warning('Not running with Sentry');
+    await _main();
+  }
+}
+
+Future<void> _main() async {
   initializeTimeZones();
   await awesomeNotifications.initialize(
       // set the icon to null if you want to use the default app icon
@@ -151,7 +166,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   try {
                     await loadStops();
                   } catch (e, s) {
-                    Logger('main.dart').shout('failed to load stops', e, s);
+                    logger.shout('failed to load stops', e, s);
                     Get.snackbar(e.toString(), s.toString());
                   }
                 }),
