@@ -238,12 +238,13 @@ class _MyHomePageState extends State<MyHomePage> {
       });
 
       var trip = stops.first.trips![0];
+      var summary = trip.summary!;
 
       setState(() {
-        routeNumber = trip.summary!.routeCode;
+        routeNumber = summary.routeCode ?? summary.routeName;
       });
 
-      var title = '$routeNumber to ${trip.summary!.headsign}';
+      var title = '$routeNumber to ${summary.headsign}';
 
       while (true) {
         var now = TZDateTime.now(getLocation('Australia/Perth'));
