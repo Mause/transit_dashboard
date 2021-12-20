@@ -16,7 +16,7 @@ import 'package:transit_dashboard/journey_planner_service.dart'
     show Location, nearbyStops;
 
 import 'generated_code/journey_planner.swagger.dart' show JourneyPlanner;
-import 'transit.dart' show getClient, getRealtime, getStopTimetable, toDateTime;
+import 'transit.dart' show getClient, getRealtime, toDateTime;
 
 var awesomeNotifications = AwesomeNotifications();
 
@@ -218,15 +218,7 @@ class _MyHomePageState extends State<MyHomePage> {
         this.stopNumber = stopNumber + " " + transitStop.description!;
       });
 
-      var response = await getStopTimetable(client, stopNumber);
-      if (response.trips!.isEmpty) {
-        setState(() {
-          routeNumber = "No trips at stop";
-        });
-        return;
-      }
-
-      var trip = response.trips![0];
+      var trip = stops.first.trips![0];
 
       setState(() {
         routeNumber = trip.summary!.routeCode;
