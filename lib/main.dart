@@ -9,8 +9,7 @@ import 'package:duration/duration.dart' show prettyDuration;
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart'
     show GeolocatorPlatform, LocationPermission, LocationSettings;
-import 'package:get/get.dart'
-    show Get, GetMaterialApp, ExtensionSnackbar;
+import 'package:get/get.dart' show Get, GetMaterialApp, ExtensionSnackbar;
 import 'package:logging/logging.dart';
 import 'package:material_you_colours/material_you_colours.dart'
     show getMaterialYouThemeData;
@@ -244,24 +243,26 @@ class _MyHomePageState extends State<MyHomePage> {
         locationSettings:
             const LocationSettings(timeLimit: Duration(seconds: 30)));
 
-    var stops = await nearbyStops('eac7a147-0831-4fcf-8fa8-a5e8ffcfa039',
-        Location(loco.latitude, loco.longitude));
+    var stops = (await nearbyStops('eac7a147-0831-4fcf-8fa8-a5e8ffcfa039',
+            Location(loco.latitude, loco.longitude)))
+        .where((element) => element.trips!.isNotEmpty)
+        .toList();
 
     setState(() {
       routeChoices.clear();
       routeChoices.addAll(stops.expand((e) => e.trips!));
     });
 
-    await showNotification(stops);
+    await showNotification(stops[0]);
   }
 
-  showNotification(List<NearbyTransitStop> stops) async {
-    var transitStop = stops.first.transitStop!;
+  showNotification(NearbyTransitStop stop) async {
+    var transitStop = stop.transitStop!;
     var stopNumber = transitStop.code!;
-    if (stops.first.trips!.isEmpty) {
-      throw Exception('No trips for ${stops.first.transitStop!.code}');
+    if (stop.trips!.isEmpty) {
+      throw Exception('No trips for ${stop.transitStop!.code}');
     }
-    var trip = stops.first.trips![0];
+    var trip = stop.trips![0];
     if (trip.arriveTime == null) {
       throw Exception('missing arrive time on ${trip.toJson()}');
     }
