@@ -11,6 +11,7 @@ import 'package:get/get.dart'
     show Get, GetMaterialApp, /*ExtensionDialog,*/ ExtensionSnackbar;
 import 'package:logging/logging.dart';
 import 'package:sentry_flutter/sentry_flutter.dart' show SentryFlutter;
+import 'package:sentry_logging/sentry_logging.dart' show LoggingIntegration;
 import 'package:timezone/data/latest.dart' show initializeTimeZones;
 import 'package:timezone/standalone.dart' show TZDateTime, getLocation;
 import 'package:transit_dashboard/journey_planner_service.dart'
@@ -28,6 +29,7 @@ void main() async {
     await SentryFlutter.init((options) {
       options.dsn = sentryDsn;
       options.tracesSampleRate = 1.0;
+      options.addIntegration(LoggingIntegration());
     }, appRunner: _main);
   } else {
     logger.warning('Not running with Sentry');

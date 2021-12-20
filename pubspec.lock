@@ -541,6 +541,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "6.2.2"
+  sentry_logging:
+    dependency: "direct main"
+    description:
+      name: sentry_logging
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "6.2.2"
   shelf:
     dependency: transitive
     description:
