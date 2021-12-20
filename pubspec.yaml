@@ -44,6 +44,8 @@ dependencies:
   geolocator: ^8.0.1
   get: ^4.6.1
   awesome_notifications: ^0.6.19
+  material_you_colours: 
+    git: https://github.com/Mause/material_you_colours
 
 dev_dependencies:
   flutter_test:
