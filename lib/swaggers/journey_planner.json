@@ -203,7 +203,8 @@
         "type": "object",
         "required": [
           "RealTimeInfo",
-          "Summary"
+          "Summary",
+          "ArriveTime"
         ],
         "properties": {
           "Summary": {
@@ -211,6 +212,10 @@
           },
           "RealTimeInfo": {
             "$ref": "#/components/schemas/RealTimeInfo"
+          },
+          "ArriveTime": {
+            "type": "string",
+            "format": "time"
           }
         }
       },

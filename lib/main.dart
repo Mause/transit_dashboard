@@ -234,24 +234,33 @@ class _MyHomePageState extends State<MyHomePage> {
       while (true) {
         // for now, we're assuming the realtime doesn't change
         var now = TZDateTime.now(getLocation('Australia/Perth'));
-        var delta =
-            toDateTime(now, getRealtime(trip.realTimeInfo)!).difference(now);
+        var dateTime = toDateTime(now, getRealtime(trip.realTimeInfo)!);
+        var delta = dateTime.difference(now);
+        String howLate = 'Lateness unknown';
+        if (trip.arriveTime != null) {
+          howLate =
+              humanDiff(toDateTime(now, trip.arriveTime!).difference(now));
+        }
 
         if (delta < Duration.zero) break;
 
-        var strung = delta
-            .toString()
-            .split(':')
-            .map((part) => int.parse(part, radix: 10))
-            .toList();
-
-        await update(title, '${strung[1]} minutes, ${strung[2]} seconds away');
+        await update(title, humanDiff(delta) + 'away\n\nRunning $howLate late');
         await Future.delayed(const Duration(seconds: 3));
       }
       await update(title, 'Departed');
     } else {
       throw Exception(locationPermission.toString());
     }
+  }
+
+  String humanDiff(Duration delta) {
+    var strung = delta
+        .toString()
+        .split(':')
+        .map((part) => int.parse(part, radix: 10))
+        .toList();
+
+    return '${strung[1]} minutes, ${strung[2]} seconds';
   }
 }
 
