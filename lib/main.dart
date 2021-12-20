@@ -9,8 +9,8 @@ import 'package:geolocator/geolocator.dart'
     show GeolocatorPlatform, LocationPermission, LocationSettings;
 import 'package:get/get.dart'
     show Get, GetMaterialApp, /*ExtensionDialog,*/ ExtensionSnackbar;
-import 'package:timezone/standalone.dart'
-    show TZDateTime, getLocation, initializeTimeZone;
+import 'package:timezone/data/latest.dart' show initializeTimeZones;
+import 'package:timezone/standalone.dart' show TZDateTime, getLocation;
 import 'package:transit_dashboard/journey_planner_service.dart'
     show Location, nearbyStops;
 
@@ -20,7 +20,7 @@ import 'transit.dart' show getClient, getRealtime, getStopTimetable, toDateTime;
 var awesomeNotifications = AwesomeNotifications();
 
 void main() async {
-  await initializeTimeZone();
+  initializeTimeZones();
   await awesomeNotifications.initialize(
       // set the icon to null if you want to use the default app icon
       null,
