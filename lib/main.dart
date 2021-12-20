@@ -195,6 +195,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     child: ListView(
                         children: routeChoices
                             .map((element) => ListTile(
+                                leading: getIcon(element.summary!),
                                 title: Text(element.summary!.makeSummary()),
                                 subtitle: Text(
                                     'Mode: ' + element.summary!.mode!.name)))
@@ -307,6 +308,27 @@ extension MakeSummary on TripSummary {
   String makeSummary() {
     return first([routeCode, routeName, mode]) + ' to $headsign';
   }
+}
+
+Icon getIcon(TripSummary summary) {
+  if (summary.routeName.endsWith('CAT')) {
+    // TODO: add colour
+    return Icon(CupertinoIcons.cat);
+  }
+
+  CupertinoIcons icon;
+  switch (summary.mode) {
+    case bus:
+      icon = CupertinoIcons.bus;
+    case ferry:
+      icon = CupertinoIcons.ferry;
+    case train:
+      icon = CupertinoIcons.train;
+    default:
+      icon = CupertinoIcons.question;
+  }
+
+  return Icon(icon);
 }
 
 first(List<dynamic> parts) {
