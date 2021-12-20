@@ -408,6 +408,15 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.12.11"
+  material_you_colours:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: HEAD
+      resolved-ref: "74cf2b618240d7e5937125bca06ce311a48764dd"
+      url: "https://github.com/Mause/material_you_colours"
+    source: git
+    version: "0.0.1"
   meta:
     dependency: transitive
     description:
@@ -779,4 +788,4 @@ packages:
     version: "3.1.0"
 sdks:
   dart: ">=2.15.0-268.18.beta <3.0.0"
-  flutter: ">=2.0.4"
+  flutter: ">=2.5.0"
