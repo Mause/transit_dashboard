@@ -24,6 +24,7 @@ import 'package:transit_dashboard/journey_planner_service.dart'
     show Location, nearbyStops;
 import 'package:duration/duration.dart' show prettyDuration;
 
+import 'generated_code/journey_planner.enums.swagger.dart';
 import 'generated_code/journey_planner.swagger.dart'
     show JourneyPlanner, Trip, TripSummary;
 import 'transit.dart' show getClient, getRealtime;
@@ -195,6 +196,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     child: ListView(
                         children: routeChoices
                             .map((element) => ListTile(
+                                iconColor: getIconColor(element.summary!),
                                 leading: getIcon(element.summary!),
                                 title: Text(element.summary!.makeSummary()),
                                 subtitle: Text(
@@ -310,20 +312,40 @@ extension MakeSummary on TripSummary {
   }
 }
 
+getIconColor(TripSummary summary) {
+  if (summary.routeName!.endsWith('CAT')) {
+    var color = summary.routeName!.split(' ')[0].toLowerCase();
+    switch (color) {
+      case "yellow":
+        return Colors.yellow;
+      case "blue":
+        return Colors.blue;
+      case "black":
+        return Colors.black;
+      case "red":
+        return Colors.red;
+    }
+  }
+  return Colors.black;
+}
+
 Icon getIcon(TripSummary summary) {
   if (summary.routeName!.endsWith('CAT')) {
     // TODO: add colour
-    return Icon(Icons.cat);
+    return const Icon(Icons.pets);
   }
 
   IconData icon;
   switch (summary.mode) {
-    case bus:
+    case TripSummaryMode.bus:
       icon = Icons.directions_bus;
-    case ferry:
+      break;
+    case TripSummaryMode.ferry:
       icon = Icons.directions_ferry;
-    case train:
+      break;
+    case TripSummaryMode.train:
       icon = Icons.directions_train;
+      break;
     default:
       icon = Icons.circle_outlined;
   }
