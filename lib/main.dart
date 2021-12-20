@@ -113,7 +113,8 @@ class _MyHomePageState extends State<MyHomePage> {
   String? routeNumber;
   String? stopNumber;
 
-  OrderedSet<Trip>? routeChoices;
+  OrderedSet<Trip> routeChoices =
+      OrderedSet(Comparing.on((t) => t.summary!.hashCode));
 
   _MyHomePageState() {
     client = getClient(
@@ -192,7 +193,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: RefreshIndicator(
                     onRefresh: reload,
                     child: ListView(
-                        children: (routeChoices ?? <Trip>[])
+                        children: routeChoices
                             .map((element) => ListTile(
                                   title: Text(element.summary!.makeSummary()),
                                   subtitle: Text('Type: ' +
@@ -219,6 +220,7 @@ class _MyHomePageState extends State<MyHomePage> {
     setState(() {
       stopNumber = null;
       routeNumber = null;
+      routeChoices.clear();
     });
 
     var isAllowed = await awesomeNotifications.isNotificationAllowed();
@@ -252,9 +254,8 @@ class _MyHomePageState extends State<MyHomePage> {
                   .toList()));
       */
 
-      routeChoices = stops
-          .expand((e) => e.trips!)
-          .toOrderedSet(Comparing.on((t) => t.summary!.hashCode));
+      routeChoices.clear();
+      routeChoices.addAll(stops.expand((e) => e.trips!));
 
       var transitStop = stops.first.transitStop!;
       var stopNumber = transitStop.code!;
