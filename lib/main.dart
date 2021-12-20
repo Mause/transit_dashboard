@@ -262,7 +262,7 @@ class _MyHomePageState extends State<MyHomePage> {
       setState(() {
         this.stopNumber = stopNumber + " " + transitStop.description!;
         routeNumber =
-            '${(summary.routeCode ?? summary.routeName)} to ${summary.headsign}';
+            '${(summary.routeCode ?? summary.routeName ?? summary.mode)} to ${summary.headsign}';
       });
 
       while (true) {

@@ -239,8 +239,9 @@
           "Direction": {
             "type": "string"
           },
-          "Status": {
-            "type": "string"
+          "Mode": {
+            "type": "string",
+            "enum": ["TRAM", "FERRY", "BUS", "TRAIN"]
           }
         }
       },
