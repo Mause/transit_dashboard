@@ -2,7 +2,7 @@ ci:
   skip: [flutter-analyze, flutter-format]
 repos:
   - repo: https://github.com/humitos/mirrors-autoflake
-    rev: v1.1
+    rev: v1.3
     hooks:
       - id: autoflake
         args:
