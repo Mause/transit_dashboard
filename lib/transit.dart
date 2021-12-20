@@ -121,11 +121,7 @@ T getClient<T extends ChopperService>(
 }
 
 tz.TZDateTime toDateTime(tz.TZDateTime now, String strung) {
-  try {
-    return tz.TZDateTime.parse(now.location, strung);
-  } on FormatException catch (e, s) {
-    logger.info('failed to parse $s', e, s);
-  }
+  assert(strung.length == 6, strung);
 
   var parts = strung.split(':').map((e) => int.parse(e)).toList();
   return tz.TZDateTime(

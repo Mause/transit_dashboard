@@ -265,13 +265,14 @@ class _MyHomePageState extends State<MyHomePage> {
       });
 
       while (true) {
-        var now = TZDateTime.now(getLocation('Australia/Perth'));
+        var perth = getLocation('Australia/Perth');
+        var now = TZDateTime.now(perth);
 
         var content = [];
 
         // for now, we're assuming the realtime doesn't change
         var realtime = getRealtime(now, trip.realTimeInfo);
-        var scheduled = toDateTime(now, trip.arriveTime!);
+        var scheduled = TZDateTime.parse(perth, trip.arriveTime!);
         var datetime = realtime ?? scheduled;
 
         var delta = datetime.difference(now);
