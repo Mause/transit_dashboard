@@ -247,7 +247,11 @@ class _MyHomePageState extends State<MyHomePage> {
 
         if (delta < Duration.zero) break;
 
-        var strung = delta.toString().split(':').map(int.parse).toList();
+        var strung = delta
+            .toString()
+            .split(':')
+            .map((part) => int.parse(part, radix: 10))
+            .toList();
 
         await update(title, '${strung[1]} minutes, ${strung[2]} seconds away');
         await Future.delayed(const Duration(seconds: 3));
