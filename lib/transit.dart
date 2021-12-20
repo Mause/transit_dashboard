@@ -34,6 +34,7 @@ Future<void> main() async {
   var apiKey = 'eac7a147-0831-4fcf-8fa8-a5e8ffcfa039';
   var stops = await nearbyStops(apiKey, location);
   logger.info('stops: ${stops.length}');
+  logger.info('trips: ${stops[0].trips?.length}');
 
   JourneyPlanner client = getClient(
       JourneyPlanner.create,
