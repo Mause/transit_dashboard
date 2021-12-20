@@ -2,6 +2,7 @@ import 'package:awesome_notifications/awesome_notifications.dart'
     show
         AwesomeNotifications,
         NotificationChannel,
+        NotificationLayout,
         NotificationChannelGroup,
         NotificationContent;
 import 'package:flutter/material.dart';
@@ -16,6 +17,7 @@ import 'package:timezone/data/latest.dart' show initializeTimeZones;
 import 'package:timezone/standalone.dart' show TZDateTime, getLocation;
 import 'package:transit_dashboard/journey_planner_service.dart'
     show Location, nearbyStops;
+import 'package:duration/duration.dart' show prettyDuration;
 
 import 'generated_code/journey_planner.swagger.dart' show JourneyPlanner;
 import 'transit.dart' show getClient, getRealtime, toDateTime;
@@ -256,16 +258,17 @@ class _MyHomePageState extends State<MyHomePage> {
         var delta = datetime.difference(now);
         if (delta < Duration.zero) break;
 
-        content.add(humanDiff(delta) + 'away');
-        if (realtime != null) {
-          var howLate = scheduled.difference(realtime);
-          content.add('Running ${humanDiff(howLate)} late');
-        } else {
+        content.add(prettyDuration(delta, conjunction: ', ') + ' away.');
+        if (realtime == null) {
           content.add(
-              'Realtime information is not available. Using scheduled time');
+              'Realtime information is not available. Using scheduled time.');
+        } else {
+          var howLate = scheduled.difference(realtime);
+          content.add(
+              'Running ${prettyDuration(howLate, conjunction: ', ')} late.');
         }
 
-        await update(title, content.join('\n\n'));
+        await update(title, content.join(' \n\n'));
         await Future.delayed(const Duration(seconds: 3));
       }
       await update(title, 'Departed');
@@ -273,14 +276,12 @@ class _MyHomePageState extends State<MyHomePage> {
       throw Exception(locationPermission.toString());
     }
   }
-
-  String humanDiff(Duration delta) {
-    var strung = delta.toString().split(':').map(double.parse).toList();
-
-    return '${strung[1]} minutes, ${strung[2]} seconds';
-  }
 }
 
 update(title, text) async => await awesomeNotifications.createNotification(
     content: NotificationContent(
-        id: 10, channelKey: 'basic_channel', title: title, body: text));
+        id: 10,
+        channelKey: 'basic_channel',
+        title: title,
+        body: text,
+        notificationLayout: NotificationLayout.BigText));
