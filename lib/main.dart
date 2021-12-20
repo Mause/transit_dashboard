@@ -239,13 +239,21 @@ class _MyHomePageState extends State<MyHomePage> {
         return;
       }
 
-      for (var _ in Iterable.generate(10)) {
+      while (true) {
         // for now, we're assuming the realtime doesn't change
         var now = TZDateTime.now(getLocation('Australia/Perth'));
-        var delta =
-            toDateTime(now, getRealtime(trip.realTimeInfo)!).difference(now);
+        var delta = toDateTime(now, getRealtime(trip.realTimeInfo)!)
+            .difference(now);
 
-        await update(title, '$delta minutes away');
+        if (delta < 0) break;
+
+        var strung = delta
+            .toString()
+            .split(':')
+            .sublist(0, 2)
+            .join('minutes');
+
+        await update(title, '$strung minutes away');
         await Future.delayed(const Duration(seconds: 3));
       }
       await update(title, 'Departed');
