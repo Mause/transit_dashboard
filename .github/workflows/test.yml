@@ -52,3 +52,27 @@ jobs:
         with:
           name: apk
           path: '*.apk'
+
+  create_github_release:
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+    needs:
+      - flutter
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - uses: actions/download-artifact@v2
+        with:
+          name: apk
+          path: '*.apk'
+
+      - uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "latest"
+          prerelease: true
+          title: "Development Build"
+          files: |
+            *.apk
