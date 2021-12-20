@@ -242,18 +242,14 @@ class _MyHomePageState extends State<MyHomePage> {
       while (true) {
         // for now, we're assuming the realtime doesn't change
         var now = TZDateTime.now(getLocation('Australia/Perth'));
-        var delta = toDateTime(now, getRealtime(trip.realTimeInfo)!)
-            .difference(now);
+        var delta =
+            toDateTime(now, getRealtime(trip.realTimeInfo)!).difference(now);
 
-        if (delta < 0) break;
+        if (delta < Duration.zero) break;
 
-        var strung = delta
-            .toString()
-            .split(':')
-            .sublist(0, 2)
-            .join('minutes');
+        var strung = delta.toString().split(':').map(int.parse).toList();
 
-        await update(title, '$strung minutes away');
+        await update(title, '${strung[1]} minutes, ${strung[2]} seconds away');
         await Future.delayed(const Duration(seconds: 3));
       }
       await update(title, 'Departed');
