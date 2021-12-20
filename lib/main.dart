@@ -311,21 +311,21 @@ extension MakeSummary on TripSummary {
 }
 
 Icon getIcon(TripSummary summary) {
-  if (summary.routeName.endsWith('CAT')) {
+  if (summary.routeName!.endsWith('CAT')) {
     // TODO: add colour
-    return Icon(CupertinoIcons.cat);
+    return Icon(Icons.cat);
   }
 
-  CupertinoIcons icon;
+  IconData icon;
   switch (summary.mode) {
     case bus:
-      icon = CupertinoIcons.bus;
+      icon = Icons.directions_bus;
     case ferry:
-      icon = CupertinoIcons.ferry;
+      icon = Icons.directions_ferry;
     case train:
-      icon = CupertinoIcons.train;
+      icon = Icons.directions_train;
     default:
-      icon = CupertinoIcons.question;
+      icon = Icons.circle_outlined;
   }
 
   return Icon(icon);
