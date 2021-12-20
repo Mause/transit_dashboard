@@ -13,7 +13,8 @@ import 'package:get/get.dart'
 import 'package:logging/logging.dart';
 import 'package:ordered_set/comparing.dart' show Comparing;
 import 'package:ordered_set/ordered_set.dart' show OrderedSet;
-import 'package:sentry_flutter/sentry_flutter.dart' show Sentry, SentryFlutter;
+import 'package:sentry_flutter/sentry_flutter.dart'
+    show Sentry, SentryFlutter, SentryNavigatorObserver;
 import 'package:sentry_logging/sentry_logging.dart' show LoggingIntegration;
 import 'package:timezone/data/latest.dart' show initializeTimeZones;
 import 'package:timezone/standalone.dart' show TZDateTime, getLocation;
@@ -72,6 +73,9 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       title: 'Transit Dashboard',
+      navigatorObservers: [
+        SentryNavigatorObserver(),
+      ],
       theme: ThemeData(
         // This is the theme of your application.
         //
