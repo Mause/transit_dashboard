@@ -13,7 +13,7 @@ import 'package:get/get.dart'
 import 'package:logging/logging.dart';
 import 'package:ordered_set/comparing.dart' show Comparing;
 import 'package:ordered_set/ordered_set.dart' show OrderedSet;
-import 'package:sentry_flutter/sentry_flutter.dart' show SentryFlutter;
+import 'package:sentry_flutter/sentry_flutter.dart' show Sentry, SentryFlutter;
 import 'package:sentry_logging/sentry_logging.dart' show LoggingIntegration;
 import 'package:timezone/data/latest.dart' show initializeTimeZones;
 import 'package:timezone/standalone.dart' show TZDateTime, getLocation;
@@ -175,6 +175,8 @@ class _MyHomePageState extends State<MyHomePage> {
                     await loadStops();
                   } catch (e, s) {
                     logger.shout('failed to load stops', e, s);
+                    await Sentry.captureException(e,
+                        stackTrace: s, hint: 'failed to load stops');
                     Get.snackbar(e.toString(), s.toString());
                   }
                 }),
