@@ -235,6 +235,12 @@
           },
           "RouteName": {
             "type": "string"
+          },
+          "Direction": {
+            "type": "string"
+          },
+          "Status": {
+            "type": "string"
           }
         }
       },

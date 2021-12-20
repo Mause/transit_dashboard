@@ -249,6 +249,9 @@ class _MyHomePageState extends State<MyHomePage> {
       var transitStop = stops.first.transitStop!;
       var stopNumber = transitStop.code!;
       var trip = stops.first.trips![0];
+      if (trip.arriveTime == null) {
+        throw Exception('missing arrive time on ${trip.toJson()}');
+      }
       var summary = trip.summary!;
 
       setState(() {
