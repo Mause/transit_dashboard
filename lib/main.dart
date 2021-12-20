@@ -23,7 +23,7 @@ import 'package:transit_dashboard/journey_planner_service.dart'
 import 'package:duration/duration.dart' show prettyDuration;
 
 import 'generated_code/journey_planner.swagger.dart' show JourneyPlanner, Trip;
-import 'transit.dart' show getClient, getRealtime, toDateTime;
+import 'transit.dart' show getClient, getRealtime;
 
 var awesomeNotifications = AwesomeNotifications();
 var logger = Logger('main.dart');

@@ -1,5 +1,5 @@
 ci:
-  skip: [dart-format]
+  skip: [flutter-analyze, flutter-format]
 repos:
   - repo: https://github.com/humitos/mirrors-autoflake
     rev: v1.3
@@ -18,7 +18,12 @@ repos:
     rev: 21.12b0
     hooks:
       - id: black
-  - repo: https://github.com/Cretezy/dart-format-pre-commit
+  - repo: https://github.com/Cretezy/flutter-format-pre-commit
     rev: "master"
     hooks:
-      - id: dart-format
+      - id: flutter-format
+        exclude: lib/generated_code
+  - repo: https://github.com/dluksza/flutter-analyze-pre-commit
+    rev: "master"
+    hooks:
+      - id: flutter-analyze
