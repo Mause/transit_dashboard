@@ -6,6 +6,7 @@ import 'package:chopper/chopper.dart'
     show ChopperClient, ChopperService, Request;
 import 'package:intl/intl.dart';
 import 'package:logging/logging.dart' show Logger;
+import 'package:sentry/sentry.dart' show SentryHttpClient;
 import 'package:timezone/standalone.dart' as tz;
 import 'package:transit_dashboard/errors.dart' show errorOrResult;
 import 'package:transit_dashboard/loggers.dart' show setupLogging;
@@ -34,6 +35,7 @@ Future<void> main() async {
   var apiKey = 'eac7a147-0831-4fcf-8fa8-a5e8ffcfa039';
   var stops = await nearbyStops(apiKey, location);
   logger.info('stops: ${stops.length}');
+  logger.info('trips: ${stops[0].trips?.length}');
 
   JourneyPlanner client = getClient(
       JourneyPlanner.create,
@@ -41,6 +43,8 @@ Future<void> main() async {
       "http://realtime.transperth.info/SJP/StopTimetableService.svc/",
       // apiKey
       "ad89905f-d5a7-487f-a876-db39092c6ee0");
+
+  var now = tz.TZDateTime.now(perth);
 
   Set<Pair<Stop, Trip>> nearbyBuses = (await Future.wait(stops
           .map((stop) => getStopTimetable(client, stop.transitStop!.code!))))
@@ -53,7 +57,7 @@ Future<void> main() async {
       .expand((element) =>
           element.trips!.map((e) => Pair.of(element.requestedStop!, e)))
       .where((element) {
-        var good = getRealtime(element.right.realTimeInfo) != null;
+        var good = getRealtime(now, element.right.realTimeInfo) != null;
         if (!good) {
           logger.warning('${element.right.toJson()} has no real time info');
         }
@@ -67,12 +71,10 @@ Future<void> main() async {
   var nearbyBus = nearbyBuses.first;
 
   var realTimeInfo = nearbyBus.right.realTimeInfo!;
-  String? arrivalTime = getRealtime(realTimeInfo);
+  tz.TZDateTime? arrivalDateTime = getRealtime(now, realTimeInfo);
 
-  assert(arrivalTime != null, "Arrival time must exist");
+  assert(arrivalDateTime != null, "Arrival time must exist");
 
-  var now = tz.TZDateTime.now(perth);
-  var arrivalDateTime = toDateTime(now, arrivalTime!);
   print({
     "now": now,
     "realTimeInfo": realTimeInfo.toJson(),
@@ -84,16 +86,16 @@ Future<void> main() async {
       nearbyBus.right.summary!.routeCode! +
           ' ' +
           nearbyBus.right.summary!.headsign!,
-      now.difference(arrivalDateTime));
+      now.difference(arrivalDateTime!));
 }
 
-String? getRealtime(RealTimeInfo? realTimeInfo) {
-  if (realTimeInfo == null) {
-    return null;
-  } else if (realTimeInfo.estimatedArrivalTime != null) {
-    return realTimeInfo.estimatedArrivalTime;
+tz.TZDateTime? getRealtime(tz.TZDateTime now, RealTimeInfo? realTimeInfo) {
+  if (realTimeInfo?.estimatedArrivalTime != null) {
+    return toDateTime(now, realTimeInfo!.estimatedArrivalTime!);
+  } else if (realTimeInfo?.actualArrivalTime != null) {
+    return toDateTime(now, realTimeInfo!.actualArrivalTime!);
   } else {
-    return realTimeInfo.actualArrivalTime;
+    return null;
   }
 }
 
@@ -101,6 +103,11 @@ T getClient<T extends ChopperService>(
     T Function() create, String baseUrl, String apiKey) {
   var baseClient = create();
   return ChopperClient(
+          client: SentryHttpClient(
+              captureFailedRequests: true,
+              networkTracing: true,
+              recordBreadcrumbs: true,
+              sendDefaultPii: true),
           services: [baseClient],
           converter: baseClient.client.converter,
           interceptors: [
@@ -113,8 +120,10 @@ T getClient<T extends ChopperService>(
       .getService<T>();
 }
 
-DateTime toDateTime(tz.TZDateTime now, String s) {
-  var parts = s.split(':').map((e) => int.parse(e)).toList();
+tz.TZDateTime toDateTime(tz.TZDateTime now, String strung) {
+  assert(strung.length == 6, strung);
+
+  var parts = strung.split(':').map((e) => int.parse(e)).toList();
   return tz.TZDateTime(
       now.location, now.year, now.month, now.day, parts[0], parts[1], parts[2]);
 }

@@ -203,7 +203,8 @@
         "type": "object",
         "required": [
           "RealTimeInfo",
-          "Summary"
+          "Summary",
+          "ArriveTime"
         ],
         "properties": {
           "Summary": {
@@ -211,6 +212,10 @@
           },
           "RealTimeInfo": {
             "$ref": "#/components/schemas/RealTimeInfo"
+          },
+          "ArriveTime": {
+            "type": "string",
+            "format": "time"
           }
         }
       },
@@ -218,7 +223,8 @@
         "type": "object",
         "required": [
           "Headsign",
-          "RouteCode"
+          "RouteCode",
+          "RouteName"
         ],
         "properties": {
           "Headsign": {
@@ -226,6 +232,16 @@
           },
           "RouteCode": {
             "type": "string"
+          },
+          "RouteName": {
+            "type": "string"
+          },
+          "Direction": {
+            "type": "string"
+          },
+          "Mode": {
+            "type": "string",
+            "enum": ["TRAM", "FERRY", "BUS", "TRAIN"]
           }
         }
       },

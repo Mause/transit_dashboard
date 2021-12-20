@@ -46,6 +46,10 @@ dependencies:
   awesome_notifications: ^0.6.19
   material_you_colours: 
     git: https://github.com/Mause/material_you_colours
+  sentry_flutter: ^6.2.2
+  sentry_logging: ^6.2.2
+  duration: ^3.0.8
+  ordered_set: ^5.0.0
 
 dev_dependencies:
   flutter_test:

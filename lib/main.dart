@@ -2,6 +2,7 @@ import 'package:awesome_notifications/awesome_notifications.dart'
     show
         AwesomeNotifications,
         NotificationChannel,
+        NotificationLayout,
         NotificationChannelGroup,
         NotificationContent;
 import 'package:flutter/material.dart';
@@ -12,17 +13,38 @@ import 'package:geolocator/geolocator.dart'
 import 'package:get/get.dart'
     show Get, GetMaterialApp, /*ExtensionDialog,*/ ExtensionSnackbar;
 import 'package:logging/logging.dart';
+import 'package:ordered_set/comparing.dart' show Comparing;
+import 'package:ordered_set/ordered_set.dart' show OrderedSet;
+import 'package:sentry_flutter/sentry_flutter.dart'
+    show Sentry, SentryFlutter, SentryNavigatorObserver;
+import 'package:sentry_logging/sentry_logging.dart' show LoggingIntegration;
 import 'package:timezone/data/latest.dart' show initializeTimeZones;
 import 'package:timezone/standalone.dart' show TZDateTime, getLocation;
 import 'package:transit_dashboard/journey_planner_service.dart'
     show Location, nearbyStops;
+import 'package:duration/duration.dart' show prettyDuration;
 
-import 'generated_code/journey_planner.swagger.dart' show JourneyPlanner;
-import 'transit.dart' show getClient, getRealtime, getStopTimetable, toDateTime;
+import 'generated_code/journey_planner.swagger.dart' show JourneyPlanner, Trip;
+import 'transit.dart' show getClient, getRealtime;
 
 var awesomeNotifications = AwesomeNotifications();
+var logger = Logger('main.dart');
 
 void main() async {
+  const sentryDsn = String.fromEnvironment('SENTRY_DSN');
+  if (sentryDsn.isEmpty) {
+    await SentryFlutter.init((options) {
+      options.dsn = sentryDsn;
+      options.tracesSampleRate = 1.0;
+      options.addIntegration(LoggingIntegration());
+    }, appRunner: _main);
+  } else {
+    logger.warning('Not running with Sentry');
+    await _main();
+  }
+}
+
+Future<void> _main() async {
   initializeTimeZones();
   await awesomeNotifications.initialize(
       // set the icon to null if you want to use the default app icon
@@ -55,6 +77,9 @@ class MyApp extends StatelessWidget {
         future: getMaterialYouThemeData(),
         builder: (BuildContext context, AsyncSnapshot<ThemeData?> theme) =>
             GetMaterialApp(
+              navigatorObservers: [
+                SentryNavigatorObserver(),
+              ],
               title: 'Transit Dashboard',
               theme: theme.data ?? ThemeData.fallback(),
               home: const MyHomePage(title: 'Transit Dashboard'),
@@ -86,6 +111,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
   String? routeNumber;
   String? stopNumber;
+
+  OrderedSet<Trip>? routeChoices;
 
   _MyHomePageState() {
     client = getClient(
@@ -145,7 +172,9 @@ class _MyHomePageState extends State<MyHomePage> {
                   try {
                     await loadStops();
                   } catch (e, s) {
-                    Logger('main.dart').shout('failed to load stops', e, s);
+                    logger.shout('failed to load stops', e, s);
+                    await Sentry.captureException(e,
+                        stackTrace: s, hint: 'failed to load stops');
                     Get.snackbar(e.toString(), s.toString());
                   }
                 }),
@@ -158,6 +187,12 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             Text('Selected stop: $stopNumber'),
             Text('Selected route: $routeNumber'),
+            ListView(
+                shrinkWrap: true,
+                children: (routeChoices ?? <Trip>[])
+                    .map((element) => ListTile(
+                        title: Text(element.summary!.toJson().toString())))
+                    .toList())
           ],
         ),
       ),
@@ -206,51 +241,52 @@ class _MyHomePageState extends State<MyHomePage> {
                   .toList()));
       */
 
+      routeChoices = stops
+          .expand((e) => e.trips!)
+          .toOrderedSet(Comparing.on((t) => t.summary!.hashCode));
+
       var transitStop = stops.first.transitStop!;
       var stopNumber = transitStop.code!;
+      var trip = stops.first.trips![0];
+      if (trip.arriveTime == null) {
+        throw Exception('missing arrive time on ${trip.toJson()}');
+      }
+      var summary = trip.summary!;
+
       setState(() {
         this.stopNumber = stopNumber + " " + transitStop.description!;
+        routeNumber =
+            '${(summary.routeCode ?? summary.routeName ?? summary.mode)} to ${summary.headsign}';
       });
-
-      var response = await getStopTimetable(client, stopNumber);
-      if (response.trips!.isEmpty) {
-        setState(() {
-          routeNumber = "No trips at stop";
-        });
-        return;
-      }
-
-      var trip = response.trips![0];
-
-      setState(() {
-        routeNumber = trip.summary!.routeCode;
-      });
-
-      var title = '$routeNumber to ${trip.summary!.headsign}';
-
-      if (getRealtime(trip.realTimeInfo) == null) {
-        await update(title, 'No realtime information available');
-        return;
-      }
 
       while (true) {
-        // for now, we're assuming the realtime doesn't change
-        var now = TZDateTime.now(getLocation('Australia/Perth'));
-        var delta =
-            toDateTime(now, getRealtime(trip.realTimeInfo)!).difference(now);
+        var perth = getLocation('Australia/Perth');
+        var now = TZDateTime.now(perth);
 
+        var content = [];
+
+        // for now, we're assuming the realtime doesn't change
+        var realtime = getRealtime(now, trip.realTimeInfo);
+        var scheduled = TZDateTime.parse(perth, trip.arriveTime!);
+        var datetime = realtime ?? scheduled;
+
+        var delta = datetime.difference(now);
         if (delta < Duration.zero) break;
 
-        var strung = delta
-            .toString()
-            .split(':')
-            .map((part) => int.parse(part, radix: 10))
-            .toList();
+        content.add(prettyDuration(delta, conjunction: ', ') + ' away.');
+        if (realtime == null) {
+          content.add(
+              'Realtime information is not available. Using scheduled time.');
+        } else {
+          var howLate = scheduled.difference(realtime);
+          content.add(
+              'Running ${prettyDuration(howLate, conjunction: ', ')} late.');
+        }
 
-        await update(title, '${strung[1]} minutes, ${strung[2]} seconds away');
+        await update(routeNumber, content.join(' \n\n'));
         await Future.delayed(const Duration(seconds: 3));
       }
-      await update(title, 'Departed');
+      await update(routeNumber, 'Departed');
     } else {
       throw Exception(locationPermission.toString());
     }
@@ -259,4 +295,16 @@ class _MyHomePageState extends State<MyHomePage> {
 
 update(title, text) async => await awesomeNotifications.createNotification(
     content: NotificationContent(
-        id: 10, channelKey: 'basic_channel', title: title, body: text));
+        id: 10,
+        channelKey: 'basic_channel',
+        title: title,
+        body: text,
+        notificationLayout: NotificationLayout.BigText));
+
+extension OrderedSetExt<E> on Iterable<E> {
+  OrderedSet<E> toOrderedSet([int Function(E e1, E e2)? compare]) {
+    var orderedSet = OrderedSet<E>(compare);
+    orderedSet.addAll(this);
+    return orderedSet;
+  }
+}
