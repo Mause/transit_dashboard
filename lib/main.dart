@@ -194,6 +194,7 @@ class _MyHomePageState extends State<MyHomePage> {
             Text('Selected stop: $stopNumber'),
             Text('Selected route: $routeNumber'),
             ListView(
+                shrinkWrap: true,
                 children: (routeChoices ?? <Trip>[])
                     .map((element) => ListTile(
                         title: Text(element.summary!.toJson().toString())))
