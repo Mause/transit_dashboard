@@ -223,13 +223,17 @@
         "type": "object",
         "required": [
           "Headsign",
-          "RouteCode"
+          "RouteCode",
+          "RouteName"
         ],
         "properties": {
           "Headsign": {
             "type": "string"
           },
           "RouteCode": {
+            "type": "string"
+          },
+          "RouteName": {
             "type": "string"
           }
         }
