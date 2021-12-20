@@ -258,11 +258,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   String humanDiff(Duration delta) {
-    var strung = delta
-        .toString()
-        .split(':')
-        .map((part) => double.parse(part, radix: 10))
-        .toList();
+    var strung = delta.toString().split(':').map(double.parse).toList();
 
     return '${strung[1]} minutes, ${strung[2]} seconds';
   }
