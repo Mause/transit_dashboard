@@ -11,6 +11,8 @@ import 'package:geolocator/geolocator.dart'
 import 'package:get/get.dart'
     show Get, GetMaterialApp, /*ExtensionDialog,*/ ExtensionSnackbar;
 import 'package:logging/logging.dart';
+import 'package:ordered_set/comparing.dart' show Comparing;
+import 'package:ordered_set/ordered_set.dart' show OrderedSet;
 import 'package:sentry_flutter/sentry_flutter.dart' show SentryFlutter;
 import 'package:sentry_logging/sentry_logging.dart' show LoggingIntegration;
 import 'package:timezone/data/latest.dart' show initializeTimeZones;
@@ -19,7 +21,7 @@ import 'package:transit_dashboard/journey_planner_service.dart'
     show Location, nearbyStops;
 import 'package:duration/duration.dart' show prettyDuration;
 
-import 'generated_code/journey_planner.swagger.dart' show JourneyPlanner;
+import 'generated_code/journey_planner.swagger.dart' show JourneyPlanner, Trip;
 import 'transit.dart' show getClient, getRealtime, toDateTime;
 
 var awesomeNotifications = AwesomeNotifications();
@@ -112,6 +114,8 @@ class _MyHomePageState extends State<MyHomePage> {
   String? routeNumber;
   String? stopNumber;
 
+  OrderedSet<Trip>? routeChoices;
+
   _MyHomePageState() {
     client = getClient(
         JourneyPlanner.create,
@@ -183,6 +187,11 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             Text('Selected stop: $stopNumber'),
             Text('Selected route: $routeNumber'),
+            ListView(
+                children: (routeChoices ?? <Trip>[])
+                    .map((element) => ListTile(
+                        title: Text(element.summary!.toJson().toString())))
+                    .toList())
           ],
         ),
       ),
@@ -231,20 +240,20 @@ class _MyHomePageState extends State<MyHomePage> {
                   .toList()));
       */
 
+      routeChoices = stops
+          .expand((e) => e.trips!)
+          .toOrderedSet(Comparing.on((t) => t.summary!.hashCode));
+
       var transitStop = stops.first.transitStop!;
       var stopNumber = transitStop.code!;
-      setState(() {
-        this.stopNumber = stopNumber + " " + transitStop.description!;
-      });
-
       var trip = stops.first.trips![0];
       var summary = trip.summary!;
 
       setState(() {
-        routeNumber = summary.routeCode ?? summary.routeName;
+        this.stopNumber = stopNumber + " " + transitStop.description!;
+        routeNumber =
+            '${(summary.routeCode ?? summary.routeName)} to ${summary.headsign}';
       });
-
-      var title = '$routeNumber to ${summary.headsign}';
 
       while (true) {
         var now = TZDateTime.now(getLocation('Australia/Perth'));
@@ -269,10 +278,10 @@ class _MyHomePageState extends State<MyHomePage> {
               'Running ${prettyDuration(howLate, conjunction: ', ')} late.');
         }
 
-        await update(title, content.join(' \n\n'));
+        await update(routeNumber, content.join(' \n\n'));
         await Future.delayed(const Duration(seconds: 3));
       }
-      await update(title, 'Departed');
+      await update(routeNumber, 'Departed');
     } else {
       throw Exception(locationPermission.toString());
     }
@@ -286,3 +295,11 @@ update(title, text) async => await awesomeNotifications.createNotification(
         title: title,
         body: text,
         notificationLayout: NotificationLayout.BigText));
+
+extension OrderedSetExt<E> on Iterable<E> {
+  OrderedSet<E> toOrderedSet([int Function(E e1, E e2)? compare]) {
+    var orderedSet = OrderedSet<E>(compare);
+    orderedSet.addAll(this);
+    return orderedSet;
+  }
+}
