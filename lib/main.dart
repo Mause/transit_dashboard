@@ -241,9 +241,9 @@ class _MyHomePageState extends State<MyHomePage> {
         // for now, we're assuming the realtime doesn't change
         var now = TZDateTime.now(getLocation('Australia/Perth'));
         var delta =
-            now.difference(toDateTime(now, getRealtime(trip.realTimeInfo)!));
+            toDateTime(now, getRealtime(trip.realTimeInfo)!).difference(now);
 
-        await update(title, '${delta.inMinutes} minutes away');
+        await update(title, '$delta minutes away');
         await Future.delayed(const Duration(seconds: 3));
       }
       await update(title, 'Departed');
