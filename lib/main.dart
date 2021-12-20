@@ -211,6 +211,13 @@ class _MyHomePageState extends State<MyHomePage> {
       });
 
       var response = await getStopTimetable(client, stopNumber);
+      if (response.trips!.isEmpty) {
+        setState(() {
+          routeNumber = "No trips at stop";
+        });
+        return;
+      }
+
       var trip = response.trips![0];
 
       setState(() {
