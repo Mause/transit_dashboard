@@ -174,6 +174,11 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> loadStops() async {
+    setState(() {
+      stopNumber = null;
+      routeNumber = null;
+    });
+
     var isAllowed = await awesomeNotifications.isNotificationAllowed();
     if (!isAllowed) {
       // This is just a basic example. For real apps, you must show some
@@ -205,9 +210,10 @@ class _MyHomePageState extends State<MyHomePage> {
                   .toList()));
       */
 
-      var stopNumber = stops[0].transitStop!.code!;
+      var transitStop = stops.first.transitStop!;
+      var stopNumber = transitStop.code!;
       setState(() {
-        this.stopNumber = stopNumber;
+        this.stopNumber = stopNumber + " " + transitStop.description!;
       });
 
       var response = await getStopTimetable(client, stopNumber);
