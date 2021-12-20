@@ -6,7 +6,7 @@ import 'package:chopper/chopper.dart'
     show ChopperClient, ChopperService, Request;
 import 'package:intl/intl.dart';
 import 'package:logging/logging.dart' show Logger;
-import 'package:sentry_flutter/sentry_flutter.dart' show SentryHttpClient;
+import 'package:sentry/sentry.dart' show SentryHttpClient;
 import 'package:timezone/standalone.dart' as tz;
 import 'package:transit_dashboard/errors.dart' show errorOrResult;
 import 'package:transit_dashboard/loggers.dart' show setupLogging;
