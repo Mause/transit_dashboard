@@ -5,14 +5,15 @@ import 'package:awesome_notifications/awesome_notifications.dart'
         NotificationLayout,
         NotificationChannelGroup,
         NotificationContent;
+import 'package:duration/duration.dart' show prettyDuration;
 import 'package:flutter/material.dart';
-import 'package:material_you_colours/material_you_colours.dart'
-    show getMaterialYouThemeData;
 import 'package:geolocator/geolocator.dart'
     show GeolocatorPlatform, LocationPermission, LocationSettings;
 import 'package:get/get.dart'
-    show Get, GetMaterialApp, /*ExtensionDialog,*/ ExtensionSnackbar;
+    show Get, GetMaterialApp, ExtensionSnackbar;
 import 'package:logging/logging.dart';
+import 'package:material_you_colours/material_you_colours.dart'
+    show getMaterialYouThemeData;
 import 'package:ordered_set/comparing.dart' show Comparing;
 import 'package:ordered_set/ordered_set.dart' show OrderedSet;
 import 'package:sentry_flutter/sentry_flutter.dart'
@@ -22,11 +23,10 @@ import 'package:timezone/data/latest.dart' show initializeTimeZones;
 import 'package:timezone/standalone.dart' show TZDateTime, getLocation;
 import 'package:transit_dashboard/journey_planner_service.dart'
     show Location, nearbyStops;
-import 'package:duration/duration.dart' show prettyDuration;
 
 import 'generated_code/journey_planner.enums.swagger.dart';
 import 'generated_code/journey_planner.swagger.dart'
-    show JourneyPlanner, Trip, TripSummary;
+    show JourneyPlanner, NearbyTransitStop, Trip, TripSummary;
 import 'transit.dart' show getClient, getRealtime;
 
 var awesomeNotifications = AwesomeNotifications();
@@ -235,74 +235,71 @@ class _MyHomePageState extends State<MyHomePage> {
 
     var locationPermission =
         await GeolocatorPlatform.instance.requestPermission();
-    if (locationPermission == LocationPermission.always ||
-        locationPermission == LocationPermission.whileInUse) {
-      var loco = await GeolocatorPlatform.instance.getCurrentPosition(
-          locationSettings:
-              const LocationSettings(timeLimit: Duration(seconds: 30)));
-
-      var stops = await nearbyStops('eac7a147-0831-4fcf-8fa8-a5e8ffcfa039',
-          Location(loco.latitude, loco.longitude));
-
-      /*
-      await Get.defaultDialog(
-          title: 'Stops',
-          content: ListView(
-              children: stops
-                  .map((e) => ListTile(
-                      title: Text(e.transitStop!.description!),
-                      subtitle: Text(
-                          '${e.transitStop!.code} - ${e.distance} metres away')))
-                  .toList()));
-      */
-
-      routeChoices.clear();
-      routeChoices.addAll(stops.expand((e) => e.trips!));
-
-      var transitStop = stops.first.transitStop!;
-      var stopNumber = transitStop.code!;
-      var trip = stops.first.trips![0];
-      if (trip.arriveTime == null) {
-        throw Exception('missing arrive time on ${trip.toJson()}');
-      }
-      var summary = trip.summary!;
-
-      setState(() {
-        this.stopNumber = stopNumber + " " + transitStop.description!;
-        routeNumber = summary.makeSummary();
-      });
-
-      while (true) {
-        var perth = getLocation('Australia/Perth');
-        var now = TZDateTime.now(perth);
-
-        var content = [];
-
-        // for now, we're assuming the realtime doesn't change
-        var realtime = getRealtime(now, trip.realTimeInfo);
-        var scheduled = TZDateTime.parse(perth, trip.arriveTime!);
-        var datetime = realtime ?? scheduled;
-
-        var delta = datetime.difference(now);
-        if (delta < Duration.zero) break;
-
-        content.add(prettyDuration(delta, conjunction: ', ') + ' away.');
-        if (realtime == null) {
-          content.add(
-              'Realtime information is not available. Using scheduled time.');
-        } else {
-          var howLate = scheduled.difference(realtime);
-          content.add(
-              'Running ${prettyDuration(howLate, conjunction: ', ')} late.');
-        }
-
-        await update(routeNumber, content.join(' \n\n'));
-        await Future.delayed(const Duration(seconds: 3));
-      }
-      await update(routeNumber, 'Departed');
-    } else {
+    if (locationPermission == LocationPermission.denied ||
+        locationPermission == LocationPermission.deniedForever) {
       throw Exception(locationPermission.toString());
     }
+
+    var loco = await GeolocatorPlatform.instance.getCurrentPosition(
+        locationSettings:
+            const LocationSettings(timeLimit: Duration(seconds: 30)));
+
+    var stops = await nearbyStops('eac7a147-0831-4fcf-8fa8-a5e8ffcfa039',
+        Location(loco.latitude, loco.longitude));
+
+    setState(() {
+      routeChoices.clear();
+      routeChoices.addAll(stops.expand((e) => e.trips!));
+    });
+
+    await showNotification(stops);
+  }
+
+  showNotification(List<NearbyTransitStop> stops) async {
+    var transitStop = stops.first.transitStop!;
+    var stopNumber = transitStop.code!;
+    if (stops.first.trips!.isEmpty) {
+      throw Exception('No trips for ${stops.first.transitStop!.code}');
+    }
+    var trip = stops.first.trips![0];
+    if (trip.arriveTime == null) {
+      throw Exception('missing arrive time on ${trip.toJson()}');
+    }
+    var summary = trip.summary!;
+
+    setState(() {
+      this.stopNumber = stopNumber + " " + transitStop.description!;
+      routeNumber = summary.makeSummary();
+    });
+
+    while (true) {
+      var perth = getLocation('Australia/Perth');
+      var now = TZDateTime.now(perth);
+
+      var content = [];
+
+      // for now, we're assuming the realtime doesn't change
+      var realtime = getRealtime(now, trip.realTimeInfo);
+      var scheduled = TZDateTime.parse(perth, trip.arriveTime!);
+      var datetime = realtime ?? scheduled;
+
+      var delta = datetime.difference(now);
+      if (delta < Duration.zero) break;
+
+      content.add(prettyDuration(delta, conjunction: ', ') + ' away.');
+      if (realtime == null) {
+        content.add(
+            'Realtime information is not available. Using scheduled time.');
+      } else {
+        var howLate = scheduled.difference(realtime);
+        content
+            .add('Running ${prettyDuration(howLate, conjunction: ', ')} late.');
+      }
+
+      await update(routeNumber, content.join(' \n\n'));
+      await Future.delayed(const Duration(seconds: 3));
+    }
+    await update(routeNumber, 'Departed');
   }
 }
 
