@@ -24,7 +24,8 @@ import 'package:transit_dashboard/journey_planner_service.dart'
     show Location, nearbyStops;
 import 'package:duration/duration.dart' show prettyDuration;
 
-import 'generated_code/journey_planner.swagger.dart' show JourneyPlanner, Trip;
+import 'generated_code/journey_planner.swagger.dart'
+    show JourneyPlanner, Trip, TripSummary;
 import 'transit.dart' show getClient, getRealtime;
 
 var awesomeNotifications = AwesomeNotifications();
@@ -191,7 +192,10 @@ class _MyHomePageState extends State<MyHomePage> {
                 shrinkWrap: true,
                 children: (routeChoices ?? <Trip>[])
                     .map((element) => ListTile(
-                        title: Text(element.summary!.toJson().toString())))
+                          title: Text(element.summary!.makeSummary()),
+                          subtitle: Text(
+                              'Type: ' + element.summary!.mode!.toString()),
+                        ))
                     .toList())
           ],
         ),
@@ -255,8 +259,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
       setState(() {
         this.stopNumber = stopNumber + " " + transitStop.description!;
-        routeNumber =
-            '${(summary.routeCode ?? summary.routeName ?? summary.mode)} to ${summary.headsign}';
+        routeNumber = summary.makeSummary();
       });
 
       while (true) {
@@ -291,6 +294,19 @@ class _MyHomePageState extends State<MyHomePage> {
       throw Exception(locationPermission.toString());
     }
   }
+}
+
+extension MakeSummary on TripSummary {
+  String makeSummary() {
+    return first([routeCode, routeName, mode]) + ' to $headsign';
+  }
+}
+
+first(List<dynamic> parts) {
+  return parts
+      .map((e) => e.toString())
+      .where((element) => element.isNotEmpty)
+      .first;
 }
 
 update(title, text) async => await awesomeNotifications.createNotification(
