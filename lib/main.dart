@@ -195,10 +195,9 @@ class _MyHomePageState extends State<MyHomePage> {
                     child: ListView(
                         children: routeChoices
                             .map((element) => ListTile(
-                                  title: Text(element.summary!.makeSummary()),
-                                  subtitle: Text('Type: ' +
-                                      element.summary!.mode!.toString()),
-                                ))
+                                title: Text(element.summary!.makeSummary()),
+                                subtitle: Text(
+                                    'Mode: ' + element.summary!.mode!.name)))
                             .toList(),
                         primary: true)))
           ],
