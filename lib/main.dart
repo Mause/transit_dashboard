@@ -9,6 +9,7 @@ import 'package:geolocator/geolocator.dart'
     show GeolocatorPlatform, LocationPermission, LocationSettings;
 import 'package:get/get.dart'
     show Get, GetMaterialApp, /*ExtensionDialog,*/ ExtensionSnackbar;
+import 'package:logging/logging.dart';
 import 'package:timezone/data/latest.dart' show initializeTimeZones;
 import 'package:timezone/standalone.dart' show TZDateTime, getLocation;
 import 'package:transit_dashboard/journey_planner_service.dart'
@@ -150,6 +151,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   try {
                     await loadStops();
                   } catch (e, s) {
+                    Logger('main.dart').shout('failed to load stops', e, s);
                     Get.snackbar(e.toString(), s.toString());
                   }
                 }),
