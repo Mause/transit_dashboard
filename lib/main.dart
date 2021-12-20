@@ -188,15 +188,18 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
             Text('Selected stop: $stopNumber'),
             Text('Selected route: $routeNumber'),
-            ListView(
-                shrinkWrap: true,
-                children: (routeChoices ?? <Trip>[])
-                    .map((element) => ListTile(
-                          title: Text(element.summary!.makeSummary()),
-                          subtitle: Text(
-                              'Type: ' + element.summary!.mode!.toString()),
-                        ))
-                    .toList())
+            Expanded(
+                child: RefreshIndicator(
+                    onRefresh: reload,
+                    child: ListView(
+                        children: (routeChoices ?? <Trip>[])
+                            .map((element) => ListTile(
+                                  title: Text(element.summary!.makeSummary()),
+                                  subtitle: Text('Type: ' +
+                                      element.summary!.mode!.toString()),
+                                ))
+                            .toList(),
+                        primary: true)))
           ],
         ),
       ),
@@ -206,6 +209,10 @@ class _MyHomePageState extends State<MyHomePage> {
         child: const Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
+  }
+
+  Future<void> reload() async {
+    await loadStops();
   }
 
   Future<void> loadStops() async {
