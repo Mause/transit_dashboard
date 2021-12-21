@@ -154,14 +154,8 @@ class _MyHomePageState extends State<MyHomePage> {
             MaterialButton(
                 child: const Text('Load stops'),
                 onPressed: () async {
-                  try {
-                    await loadStops();
-                  } catch (e, s) {
-                    logger.shout('failed to load stops', e, s);
-                    await Sentry.captureException(e,
-                        stackTrace: s, hint: 'failed to load stops');
-                    Get.snackbar(e.toString(), s.toString());
-                  }
+                  await catcher(
+                      'failed to load stops', () async => await loadStops());
                 }),
             Text('Selected stop: $stopNumber'),
             Text('Selected route: $routeNumber'),
@@ -188,8 +182,11 @@ class _MyHomePageState extends State<MyHomePage> {
                                     children: [
                                       ElevatedButton(
                                         onPressed: () async {
-                                          await showNotification(
-                                              tup.item1, tup.item2);
+                                          await catcher(
+                                              'failed to show notification',
+                                              () async =>
+                                                  await showNotification(
+                                                      tup.item1, tup.item2));
                                         },
                                         child: const Text('Track'),
                                       )
@@ -206,7 +203,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> reload() async {
-    await loadStops();
+    await catcher('failed to reload', () async => await loadStops());
   }
 
   Future<void> loadStops() async {
@@ -286,6 +283,16 @@ class _MyHomePageState extends State<MyHomePage> {
       await Future.delayed(const Duration(seconds: 3));
     }
     await update(routeNumber, 'Departed');
+  }
+}
+
+Future<void> catcher(String hint, Future<void> Function() cb) async {
+  try {
+    await cb();
+  } catch (e, s) {
+    logger.shout(hint, e, s);
+    await Sentry.captureException(e, stackTrace: s, hint: hint);
+    Get.snackbar(e.toString(), s.toString());
   }
 }
 
