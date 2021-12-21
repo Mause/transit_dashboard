@@ -165,40 +165,12 @@ class _MyHomePageState extends State<MyHomePage> {
                             ],
                           )
                         : ListView(
-                            children: routeChoices.map((tup) {
-                              var element = tup.item2;
-                              return ListTile(
-                                  iconColor: getIconColor(element.summary!),
-                                  leading: getIcon(element.summary!),
-                                  title: Text(element.summary!.makeSummary()),
-                                  subtitle: Column(
-                                    children: [
-                                      SizedBox(
-                                          height: 50,
-                                          child: Text('Mode: ' +
-                                              (element.summary?.mode?.name ??
-                                                  'Unknown') +
-                                              ', Time: ' +
-                                              (element.arriveTime ??
-                                                  'Unknown'))),
-                                      Row(
-                                        children: [
-                                          ElevatedButton(
-                                            onPressed: () async {
-                                              await catcher(
-                                                  'failed to show notification',
-                                                  () async =>
-                                                      await showNotification(
-                                                          tup.item1,
-                                                          tup.item2));
-                                            },
-                                            child: const Text('Track'),
-                                          )
-                                        ],
-                                      )
-                                    ],
-                                  ));
-                            }).toList(),
+                            children: routeChoices
+                                .map((tup) => TripTile(
+                                    stop: tup.item1,
+                                    trip: tup.item2,
+                                    showNotification: showNotification))
+                                .toList(),
                             primary: true)))
           ],
         ),
@@ -248,7 +220,7 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  showNotification(Stop transitStop, Trip trip) async {
+  Future<void> showNotification(Stop transitStop, Trip trip) async {
     if (trip.arriveTime == null) {
       throw Exception('missing arrive time on ${trip.toJson()}');
     }
@@ -287,6 +259,49 @@ class _MyHomePageState extends State<MyHomePage> {
       await Future.delayed(const Duration(seconds: 3));
     }
     await update(routeNumber!, ['Departed']);
+  }
+}
+
+class TripTile extends StatelessWidget {
+  final Trip trip;
+  final Stop stop;
+  final Future<void> Function(Stop stop, Trip trip) showNotification;
+
+  const TripTile(
+      {Key? key,
+      required this.trip,
+      required this.stop,
+      required this.showNotification})
+      : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    var element = trip;
+    return ListTile(
+        iconColor: getIconColor(element.summary!),
+        leading: getIcon(element.summary!),
+        title: Text(element.summary!.makeSummary()),
+        subtitle: Column(
+          children: [
+            SizedBox(
+                height: 50,
+                child: Text('Mode: ' +
+                    (element.summary?.mode?.name ?? 'Unknown') +
+                    ', Time: ' +
+                    (element.arriveTime ?? 'Unknown'))),
+            Row(
+              children: [
+                ElevatedButton(
+                  onPressed: () async {
+                    await catcher('failed to show notification',
+                        () async => showNotification(stop, trip));
+                  },
+                  child: const Text('Track'),
+                )
+              ],
+            )
+          ],
+        ));
   }
 }
 
