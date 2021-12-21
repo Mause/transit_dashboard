@@ -353,13 +353,13 @@ first(List<dynamic> parts) {
       .first;
 }
 
-update(title, text) async => await awesomeNotifications.createNotification(
+update(String title, String text) async => await awesomeNotifications.createNotification(
     content: NotificationContent(
         id: 10,
         channelKey: 'basic_channel',
         title: title,
-        summary: text.replace('\n', '<br><br>'),
-        body: text.replace('\n', '<br><br>'),
+        summary: text.replaceAll('\n', '<br><br>'),
+        body: text.replaceAll('\n', '<br><br>'),
         notificationLayout: NotificationLayout.BigText));
 
 extension OrderedSetExt<E> on Iterable<E> {
