@@ -377,7 +377,8 @@ update(title, text) async => await awesomeNotifications.createNotification(
         id: 10,
         channelKey: 'basic_channel',
         title: title,
-        body: text,
+        summary: text.replace('\n', '<br><br>'),
+        body: text.replace('\n', '<br><br>'),
         notificationLayout: NotificationLayout.BigText));
 
 extension OrderedSetExt<E> on Iterable<E> {
