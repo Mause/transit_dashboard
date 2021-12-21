@@ -151,51 +151,55 @@ class _MyHomePageState extends State<MyHomePage> {
           // horizontal).
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            MaterialButton(
-                child: const Text('Load stops'),
-                onPressed: () async {
-                  await catcher(
-                      'failed to load stops', () async => await loadStops());
-                }),
-            Text('Selected stop: $stopNumber'),
-            Text('Selected route: $routeNumber'),
+            Text('Selected stop: $stopNumber, route: $routeNumber'),
             Expanded(
                 child: RefreshIndicator(
                     onRefresh: reload,
-                    child: ListView(
-                        children: routeChoices.map((tup) {
-                          var element = tup.item2;
-                          return ListTile(
-                              iconColor: getIconColor(element.summary!),
-                              leading: getIcon(element.summary!),
-                              title: Text(element.summary!.makeSummary()),
-                              subtitle: Column(
-                                children: [
-                                  SizedBox(
-                                      height: 50,
-                                      child: Text('Mode: ' +
-                                          (element.summary?.mode?.name ??
-                                              'Unknown') +
-                                          ', Time: ' +
-                                          (element.arriveTime ?? 'Unknown'))),
-                                  Row(
+                    child: routeChoices.isEmpty
+                        ? Stack(
+                            children: <Widget>[
+                              const Center(
+                                child: Text('Pull to load nearby trips'),
+                              ),
+                              ListView(),
+                            ],
+                          )
+                        : ListView(
+                            children: routeChoices.map((tup) {
+                              var element = tup.item2;
+                              return ListTile(
+                                  iconColor: getIconColor(element.summary!),
+                                  leading: getIcon(element.summary!),
+                                  title: Text(element.summary!.makeSummary()),
+                                  subtitle: Column(
                                     children: [
-                                      ElevatedButton(
-                                        onPressed: () async {
-                                          await catcher(
-                                              'failed to show notification',
-                                              () async =>
-                                                  await showNotification(
-                                                      tup.item1, tup.item2));
-                                        },
-                                        child: const Text('Track'),
+                                      SizedBox(
+                                          height: 50,
+                                          child: Text('Mode: ' +
+                                              (element.summary?.mode?.name ??
+                                                  'Unknown') +
+                                              ', Time: ' +
+                                              (element.arriveTime ??
+                                                  'Unknown'))),
+                                      Row(
+                                        children: [
+                                          ElevatedButton(
+                                            onPressed: () async {
+                                              await catcher(
+                                                  'failed to show notification',
+                                                  () async =>
+                                                      await showNotification(
+                                                          tup.item1,
+                                                          tup.item2));
+                                            },
+                                            child: const Text('Track'),
+                                          )
+                                        ],
                                       )
                                     ],
-                                  )
-                                ],
-                              ));
-                        }).toList(),
-                        primary: true)))
+                                  ));
+                            }).toList(),
+                            primary: true)))
           ],
         ),
       ),
