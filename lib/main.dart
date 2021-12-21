@@ -154,7 +154,8 @@ class _MyHomePageState extends State<MyHomePage> {
             MaterialButton(
                 child: const Text('Load stops'),
                 onPressed: () async {
-                  await catcher('failed to load stops', () => loadStops());
+                  await catcher(
+                      'failed to load stops', () async => await loadStops());
                 }),
             Text('Selected stop: $stopNumber'),
             Text('Selected route: $routeNumber'),
@@ -183,8 +184,9 @@ class _MyHomePageState extends State<MyHomePage> {
                                         onPressed: () async {
                                           await catcher(
                                               'failed to show notification',
-                                              () => showNotification(
-                                                  tup.item1, tup.item2));
+                                              () async =>
+                                                  await showNotification(
+                                                      tup.item1, tup.item2));
                                         },
                                         child: const Text('Track'),
                                       )
@@ -201,7 +203,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> reload() async {
-    await catcher('failed to reload', () => loadStops());
+    await catcher('failed to reload', () async => await loadStops());
   }
 
   Future<void> loadStops() async {
