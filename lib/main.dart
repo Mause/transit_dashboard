@@ -114,7 +114,7 @@ class _MyHomePageState extends State<MyHomePage> {
   String? stopNumber;
 
   OrderedSet<Tuple2<Stop, Trip>> routeChoices = OrderedSet(Comparing.on(
-      (t) => Tuple2(t.item2.arriveTime, t.item2.summary!).hashCode));
+      (t) => Tuple2(t.item2.arriveTime, t.item2.summary!)));
 
   _MyHomePageState() {
     client = getClient(
