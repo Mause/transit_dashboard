@@ -263,7 +263,7 @@ class _MyHomePageState extends State<MyHomePage> {
       var perth = getLocation('Australia/Perth');
       var now = TZDateTime.now(perth);
 
-      var content = [];
+      var content = <String>[];
 
       // for now, we're assuming the realtime doesn't change
       var realtime = getRealtime(now, trip.realTimeInfo);
@@ -283,10 +283,10 @@ class _MyHomePageState extends State<MyHomePage> {
             .add('Running ${prettyDuration(howLate, conjunction: ', ')} late.');
       }
 
-      await update(routeNumber!, content.join(' \n\n'));
+      await update(routeNumber!, content);
       await Future.delayed(const Duration(seconds: 3));
     }
-    await update(routeNumber!, 'Departed');
+    await update(routeNumber!, ['Departed']);
   }
 }
 
@@ -353,14 +353,14 @@ String first(List<Object?> parts) {
       .first;
 }
 
-Future<void> update(String title, String text) async =>
+Future<void> update(String title, List<String> text) async =>
     awesomeNotifications.createNotification(
         content: NotificationContent(
             id: 10,
             channelKey: 'basic_channel',
             title: title,
-            summary: text.replaceAll('\n', '<br><br>'),
-            body: text.replaceAll('\n', '<br><br>'),
+            summary: text[0],
+            body: text.join('<br>'),
             notificationLayout: NotificationLayout.BigText));
 
 extension OrderedSetExt<E> on Iterable<E> {
