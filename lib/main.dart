@@ -344,7 +344,6 @@ getIconColor(TripSummary summary) {
 
 Icon getIcon(TripSummary summary) {
   if (summary.routeName!.endsWith('CAT')) {
-    // TODO: add colour
     return const Icon(Icons.pets);
   }
 
