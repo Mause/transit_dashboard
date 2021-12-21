@@ -336,7 +336,7 @@ Icon getIcon(TripSummary summary) {
     case TripSummaryMode.ferry:
       icon = Icons.directions_ferry;
       break;
-    case TripSummaryMode.train:
+    case TripSummaryMode.rail:
       icon = Icons.directions_train;
       break;
     default:

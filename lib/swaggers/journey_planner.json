@@ -241,7 +241,7 @@
           },
           "Mode": {
             "type": "string",
-            "enum": ["TRAM", "FERRY", "BUS", "TRAIN"]
+            "enum": ["TRAM", "FERRY", "BUS", "RAIL"]
           }
         }
       },
