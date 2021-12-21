@@ -204,8 +204,11 @@ class _MyHomePageState extends State<MyHomePage> {
                                 children: [
                                   SizedBox(
                                       height: 50,
-                                      child: Text('Mode: ' +
-                                          element.summary!.mode!.name)),
+                                      child: Row(children: [
+                                        Text('Mode: ' +
+                                            element.summary!.mode!.name),
+                                        Text('Time: ' + element.arriveTime),
+                                      ])),
                                   Row(
                                     children: [
                                       ElevatedButton(
