@@ -207,7 +207,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                       child: Row(children: [
                                         Text('Mode: ' +
                                             element.summary!.mode!.name),
-                                        Text('Time: ' + element.arriveTime),
+                                        Text('Time: ' + element.arriveTime!),
                                       ])),
                                   Row(
                                     children: [
