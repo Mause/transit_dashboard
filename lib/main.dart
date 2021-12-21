@@ -276,32 +276,30 @@ class TripTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var element = trip;
-    return ListTile(
-        iconColor: getIconColor(element.summary!),
-        leading: getIcon(element.summary!),
-        title: Text(element.summary!.makeSummary()),
-        subtitle: Column(
+    return Card(
+        child: Column(
+      children: [
+        ListTile(
+            iconColor: getIconColor(trip.summary!),
+            leading: getIcon(trip.summary!),
+            title: Text(trip.summary!.makeSummary()),
+            subtitle: Text('Mode: ' +
+                (trip.summary?.mode?.name ?? 'Unknown') +
+                ', Time: ' +
+                (trip.arriveTime ?? 'Unknown'))),
+        ButtonBar(
           children: [
-            SizedBox(
-                height: 50,
-                child: Text('Mode: ' +
-                    (element.summary?.mode?.name ?? 'Unknown') +
-                    ', Time: ' +
-                    (element.arriveTime ?? 'Unknown'))),
-            Row(
-              children: [
-                ElevatedButton(
-                  onPressed: () async {
-                    await catcher('failed to show notification',
-                        () async => showNotification(stop, trip));
-                  },
-                  child: const Text('Track'),
-                )
-              ],
+            ElevatedButton(
+              onPressed: () async {
+                await catcher('failed to show notification',
+                    () async => showNotification(stop, trip));
+              },
+              child: const Text('Track'),
             )
           ],
-        ));
+        )
+      ],
+    ));
   }
 }
 
