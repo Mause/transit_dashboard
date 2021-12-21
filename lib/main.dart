@@ -194,34 +194,32 @@ class _MyHomePageState extends State<MyHomePage> {
                 child: RefreshIndicator(
                     onRefresh: reload,
                     child: ListView(
-                        children: routeChoices
-                            .map((tup) {
-                              var element = tup.item2;
-                              return ListTile(
-                                iconColor: getIconColor(element.summary!),
-                                leading: getIcon(element.summary!),
-                                title: Text(element.summary!.makeSummary()),
-                                subtitle: Column(
-                                  children: [
-                                    SizedBox(
-                                        height: 50,
-                                        child: Text('Mode: ' +
-                                            element.summary!.mode!.name)),
-                                    Row(
-                                      children: [
-                                        ElevatedButton(
-                                          onPressed: () async {
-                                            await showNotification(
-                                                tup.item1, tup.item2);
-                                          },
-                                          child: const Text('Track'),
-                                        )
-                                      ],
-                                    )
-                                  ],
-                                ));
-                            })
-                            .toList(),
+                        children: routeChoices.map((tup) {
+                          var element = tup.item2;
+                          return ListTile(
+                              iconColor: getIconColor(element.summary!),
+                              leading: getIcon(element.summary!),
+                              title: Text(element.summary!.makeSummary()),
+                              subtitle: Column(
+                                children: [
+                                  SizedBox(
+                                      height: 50,
+                                      child: Text('Mode: ' +
+                                          element.summary!.mode!.name)),
+                                  Row(
+                                    children: [
+                                      ElevatedButton(
+                                        onPressed: () async {
+                                          await showNotification(
+                                              tup.item1, tup.item2);
+                                        },
+                                        child: const Text('Track'),
+                                      )
+                                    ],
+                                  )
+                                ],
+                              ));
+                        }).toList(),
                         primary: true)))
           ],
         ),
@@ -271,7 +269,8 @@ class _MyHomePageState extends State<MyHomePage> {
 
     setState(() {
       routeChoices.clear();
-      routeChoices.addAll(stops.expand((e) => e.trips!.map((trip) => Tuple2(e.transitStop!, trip))));
+      routeChoices.addAll(stops
+          .expand((e) => e.trips!.map((trip) => Tuple2(e.transitStop!, trip))));
     });
   }
 
