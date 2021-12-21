@@ -179,11 +179,11 @@ class _MyHomePageState extends State<MyHomePage> {
                                 children: [
                                   SizedBox(
                                       height: 50,
-                                      child: Row(children: [
-                                        Text('Mode: ' +
-                                            element.summary!.mode!.name),
-                                        Text('Time: ' + element.arriveTime!),
-                                      ])),
+                                      child: Text('Mode: ' +
+                                          (element.summary?.mode?.name ??
+                                              'Unknown') +
+                                          ', Time: ' +
+                                          (element.arriveTime ?? 'Unknown'))),
                                   Row(
                                     children: [
                                       ElevatedButton(
@@ -314,7 +314,6 @@ getIconColor(TripSummary summary) {
 
 Icon getIcon(TripSummary summary) {
   if (summary.routeName!.endsWith('CAT')) {
-    // TODO: add colour
     return const Icon(Icons.pets);
   }
 
@@ -348,7 +347,8 @@ update(title, text) async => await awesomeNotifications.createNotification(
         id: 10,
         channelKey: 'basic_channel',
         title: title,
-        body: text,
+        summary: text.replace('\n', '<br><br>'),
+        body: text.replace('\n', '<br><br>'),
         notificationLayout: NotificationLayout.BigText));
 
 extension OrderedSetExt<E> on Iterable<E> {
