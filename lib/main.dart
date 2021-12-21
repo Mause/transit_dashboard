@@ -207,7 +207,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> reload() async {
-    await catcher('failed to reload', () async => await loadStops());
+    await catcher('failed to reload', () async => loadStops());
   }
 
   Future<void> loadStops() async {
@@ -283,10 +283,10 @@ class _MyHomePageState extends State<MyHomePage> {
             .add('Running ${prettyDuration(howLate, conjunction: ', ')} late.');
       }
 
-      await update(routeNumber, content.join(' \n\n'));
+      await update(routeNumber!, content.join(' \n\n'));
       await Future.delayed(const Duration(seconds: 3));
     }
-    await update(routeNumber, 'Departed');
+    await update(routeNumber!, 'Departed');
   }
 }
 
@@ -346,21 +346,22 @@ Icon getIcon(TripSummary summary) {
   return Icon(icon);
 }
 
-first(List<dynamic> parts) {
+String first(List<Object?> parts) {
   return parts
       .map((e) => e.toString())
       .where((element) => element.isNotEmpty)
       .first;
 }
 
-update(String title, String text) async => await awesomeNotifications.createNotification(
-    content: NotificationContent(
-        id: 10,
-        channelKey: 'basic_channel',
-        title: title,
-        summary: text.replaceAll('\n', '<br><br>'),
-        body: text.replaceAll('\n', '<br><br>'),
-        notificationLayout: NotificationLayout.BigText));
+Future<void> update(String title, String text) async =>
+    awesomeNotifications.createNotification(
+        content: NotificationContent(
+            id: 10,
+            channelKey: 'basic_channel',
+            title: title,
+            summary: text.replaceAll('\n', '<br><br>'),
+            body: text.replaceAll('\n', '<br><br>'),
+            notificationLayout: NotificationLayout.BigText));
 
 extension OrderedSetExt<E> on Iterable<E> {
   OrderedSet<E> toOrderedSet([int Function(E e1, E e2)? compare]) {
