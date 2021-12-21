@@ -181,8 +181,10 @@ class _MyHomePageState extends State<MyHomePage> {
                                     children: [
                                       ElevatedButton(
                                         onPressed: () async {
-                                          await catcher(() => showNotification(
-                                              tup.item1, tup.item2));
+                                          await catcher(
+                                              'failed to show notification',
+                                              () => showNotification(
+                                                  tup.item1, tup.item2));
                                         },
                                         child: const Text('Track'),
                                       )
@@ -199,7 +201,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> reload() async {
-    await catcher(() => loadStops());
+    await catcher('failed to reload', () => loadStops());
   }
 
   Future<void> loadStops() async {
