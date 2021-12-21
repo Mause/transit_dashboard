@@ -10,6 +10,7 @@ import 'package:sentry/sentry.dart' show SentryHttpClient;
 import 'package:timezone/standalone.dart' as tz;
 import 'package:transit_dashboard/errors.dart' show errorOrResult;
 import 'package:transit_dashboard/loggers.dart' show setupLogging;
+import 'package:tuple/tuple.dart';
 
 import 'generated_code/journey_planner.swagger.dart'
     show
@@ -20,7 +21,6 @@ import 'generated_code/journey_planner.swagger.dart'
         StopTimetableResponse,
         Trip;
 import 'journey_planner_service.dart' show Location, nearbyStops;
-import 'pair.dart' show Pair;
 
 var json = const JsonEncoder.withIndent('  ');
 var logger = Logger('transit.dart');
@@ -46,7 +46,7 @@ Future<void> main() async {
 
   var now = tz.TZDateTime.now(perth);
 
-  Set<Pair<Stop, Trip>> nearbyBuses = (await Future.wait(stops
+  Set<Tuple2<Stop, Trip>> nearbyBuses = (await Future.wait(stops
           .map((stop) => getStopTimetable(client, stop.transitStop!.code!))))
       .where((element) {
         if (element.trips == null) {
@@ -55,22 +55,22 @@ Future<void> main() async {
         return element.trips != null;
       })
       .expand((element) =>
-          element.trips!.map((e) => Pair.of(element.requestedStop!, e)))
+          element.trips!.map((e) => Tuple2(element.requestedStop!, e)))
       .where((element) {
-        var good = getRealtime(now, element.right.realTimeInfo) != null;
+        var good = getRealtime(now, element.item2.realTimeInfo) != null;
         if (!good) {
-          logger.warning('${element.right.toJson()} has no real time info');
+          logger.warning('${element.item2.toJson()} has no real time info');
         }
         return good;
       })
       .toSet();
 
   print(json.convert({
-    'closest': nearbyBuses.map((e) => e.left.description).toSet().toList()
+    'closest': nearbyBuses.map((e) => e.item1.description).toSet().toList()
   }));
   var nearbyBus = nearbyBuses.first;
 
-  var realTimeInfo = nearbyBus.right.realTimeInfo!;
+  var realTimeInfo = nearbyBus.item2.realTimeInfo!;
   tz.TZDateTime? arrivalDateTime = getRealtime(now, realTimeInfo);
 
   assert(arrivalDateTime != null, "Arrival time must exist");
@@ -82,10 +82,10 @@ Future<void> main() async {
   });
 
   createNotification(
-      nearbyBus.left.description!,
-      nearbyBus.right.summary!.routeCode! +
+      nearbyBus.item1.description!,
+      nearbyBus.item2.summary!.routeCode! +
           ' ' +
-          nearbyBus.right.summary!.headsign!,
+          nearbyBus.item2.summary!.headsign!,
       now.difference(arrivalDateTime!));
 }
 
