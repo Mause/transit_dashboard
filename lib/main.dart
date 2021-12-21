@@ -22,10 +22,11 @@ import 'package:timezone/data/latest.dart' show initializeTimeZones;
 import 'package:timezone/standalone.dart' show TZDateTime, getLocation;
 import 'package:transit_dashboard/journey_planner_service.dart'
     show Location, nearbyStops;
+import 'package:tuple/tuple.dart';
 
 import 'generated_code/journey_planner.enums.swagger.dart';
 import 'generated_code/journey_planner.swagger.dart'
-    show JourneyPlanner, NearbyTransitStop, Trip, TripSummary;
+    show JourneyPlanner, Stop, Trip, TripSummary;
 import 'transit.dart' show getClient, getRealtime;
 
 var awesomeNotifications = AwesomeNotifications();
@@ -113,8 +114,8 @@ class _MyHomePageState extends State<MyHomePage> {
   String? routeNumber;
   String? stopNumber;
 
-  OrderedSet<Trip> routeChoices =
-      OrderedSet(Comparing.on((t) => t.summary!.hashCode));
+  OrderedSet<Tuple2<Stop, Trip>> routeChoices =
+      OrderedSet(Comparing.on((t) => t.item2.summary!.hashCode));
 
   _MyHomePageState() {
     client = getClient(
@@ -194,12 +195,32 @@ class _MyHomePageState extends State<MyHomePage> {
                     onRefresh: reload,
                     child: ListView(
                         children: routeChoices
-                            .map((element) => ListTile(
+                            .map((tup) {
+                              var element = tup.item2;
+                              return ListTile(
                                 iconColor: getIconColor(element.summary!),
                                 leading: getIcon(element.summary!),
                                 title: Text(element.summary!.makeSummary()),
-                                subtitle: Text(
-                                    'Mode: ' + element.summary!.mode!.name)))
+                                subtitle: Column(
+                                  children: [
+                                    SizedBox(
+                                        height: 50,
+                                        child: Text('Mode: ' +
+                                            element.summary!.mode!.name)),
+                                    Row(
+                                      children: [
+                                        ElevatedButton(
+                                          onPressed: () async {
+                                            await showNotification(
+                                                tup.item1, tup.item2);
+                                          },
+                                          child: const Text('Track'),
+                                        )
+                                      ],
+                                    )
+                                  ],
+                                ));
+                            })
                             .toList(),
                         primary: true)))
           ],
@@ -250,26 +271,18 @@ class _MyHomePageState extends State<MyHomePage> {
 
     setState(() {
       routeChoices.clear();
-      routeChoices.addAll(stops.expand((e) => e.trips!));
+      routeChoices.addAll(stops.expand((e) => e.trips!.map((trip) => Tuple2(e.transitStop!, trip))));
     });
-
-    await showNotification(stops[0]);
   }
 
-  showNotification(NearbyTransitStop stop) async {
-    var transitStop = stop.transitStop!;
-    var stopNumber = transitStop.code!;
-    if (stop.trips!.isEmpty) {
-      throw Exception('No trips for ${stop.transitStop!.code}');
-    }
-    var trip = stop.trips![0];
+  showNotification(Stop transitStop, Trip trip) async {
     if (trip.arriveTime == null) {
       throw Exception('missing arrive time on ${trip.toJson()}');
     }
     var summary = trip.summary!;
 
     setState(() {
-      this.stopNumber = stopNumber + " " + transitStop.description!;
+      stopNumber = transitStop.code! + " " + transitStop.description!;
       routeNumber = summary.makeSummary();
     });
 
