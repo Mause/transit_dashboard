@@ -119,7 +119,7 @@ class _MyHomePageState extends State<MyHomePage> {
     TripSummary item2 = t.item2.summary!;
     return TupleComparing([
       item1,
-      TupleComparing([item2.hashCode, item2.direction!])
+      TupleComparing([item2.routeCode, item2.direction!])
     ]);
   }));
 
