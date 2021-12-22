@@ -27,4 +27,8 @@ void main() {
     expect(find.text('0'), findsNothing);
     expect(find.text('1'), findsOneWidget);
   });
+  test('tuple sorting', () {
+    expect(
+        TupleComparing([1, 2]).compareTo(TupleComparing([1, 2])), equalTo(0));
+  });
 }
