@@ -31,6 +31,6 @@ void main() {
   */
   test('tuple sorting', () {
     expect(
-        TupleComparing([1, 2]).compareTo(TupleComparing([1, 2])), equalTo(0));
+        TupleComparing([1, 2]).compareTo(TupleComparing([1, 2])), equals(0));
   });
 }
