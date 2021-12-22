@@ -38,7 +38,7 @@ void main() {
     var actual = [
       const Tuple2(1, 2),
       const Tuple2(1, 1),
-    ]..sort(Comparing.on((t) => TupleComparing(t.toList())));
+    ]..sort(Comparing.on((t) => toComparable<num, num>(t)));
     expect(
         actual,
         equals(const [

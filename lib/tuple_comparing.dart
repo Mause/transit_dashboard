@@ -1,8 +1,9 @@
 import 'package:quiver/collection.dart' show listsEqual;
 import 'package:quiver/iterables.dart' show zip;
+import 'package:tuple/tuple.dart';
 
 class TupleComparing implements Comparable<TupleComparing> {
-  List<dynamic> items;
+  List<Comparable> items;
 
   TupleComparing(this.items);
 
@@ -28,3 +29,8 @@ class TupleComparing implements Comparable<TupleComparing> {
   @override
   String toString() => "<TupleComparing $items>";
 }
+
+TupleComparing
+    toComparable<T1 extends Comparable<T1>, T2 extends Comparable<T2>>(
+            Tuple2<T1, T2> other) =>
+        TupleComparing(other.toList().map((e) => e as Comparable).toList());
