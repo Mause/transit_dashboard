@@ -15,6 +15,7 @@ import 'package:material_you_colours/material_you_colours.dart'
     show getMaterialYouThemeData;
 import 'package:ordered_set/comparing.dart' show Comparing;
 import 'package:ordered_set/ordered_set.dart' show OrderedSet;
+import 'package:quiver/iterables.dart';
 import 'package:sentry_flutter/sentry_flutter.dart'
     show Sentry, SentryFlutter, SentryNavigatorObserver;
 import 'package:sentry_logging/sentry_logging.dart' show LoggingIntegration;
@@ -114,7 +115,11 @@ class _MyHomePageState extends State<MyHomePage> {
   String? stopNumber;
 
   OrderedSet<Tuple2<Stop, Trip>> routeChoices = OrderedSet(Comparing.on(
-      (t) => Tuple2(t.item2.arriveTime, t.item2.summary!)));
+      (t) {
+        String? item1 = t.item2.arriveTime!;
+        TripSummary item2 = t.item2.summary!;
+        return TupleComparing([item1, item2]);
+      }));
 
   _MyHomePageState() {
     client = getClient(
@@ -259,6 +264,23 @@ class _MyHomePageState extends State<MyHomePage> {
       await Future.delayed(const Duration(seconds: 3));
     }
     await update(routeNumber!, ['Departed']);
+  }
+}
+
+class TupleComparing implements Comparable<List<dynamic>> {
+  List<dynamic> items;
+
+  TupleComparing(this.items);
+
+  @override
+  int compareTo(List<dynamic> other) {
+    var cmp = 0;
+    for (List<dynamic> pair in zip([items, other])) {
+      // ignore: avoid_dynamic_calls
+      cmp = pair[0].compareTo(pair[1]);
+      if (cmp != 0) return cmp;
+    }
+    return cmp;
   }
 }
 
