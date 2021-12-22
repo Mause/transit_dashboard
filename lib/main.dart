@@ -15,7 +15,6 @@ import 'package:material_you_colours/material_you_colours.dart'
     show getMaterialYouThemeData;
 import 'package:ordered_set/comparing.dart' show Comparing;
 import 'package:ordered_set/ordered_set.dart' show OrderedSet;
-import 'package:quiver/iterables.dart';
 import 'package:sentry_flutter/sentry_flutter.dart'
     show Sentry, SentryFlutter, SentryNavigatorObserver;
 import 'package:sentry_logging/sentry_logging.dart' show LoggingIntegration;
@@ -29,6 +28,7 @@ import 'generated_code/journey_planner.enums.swagger.dart';
 import 'generated_code/journey_planner.swagger.dart'
     show JourneyPlanner, Stop, Trip, TripSummary;
 import 'transit.dart' show getClient, getRealtime;
+import 'tuple_comparing.dart';
 
 var awesomeNotifications = AwesomeNotifications();
 var logger = Logger('main.dart');
@@ -263,23 +263,6 @@ class _MyHomePageState extends State<MyHomePage> {
       await Future.delayed(const Duration(seconds: 3));
     }
     await update(routeNumber!, ['Departed']);
-  }
-}
-
-class TupleComparing implements Comparable<List<dynamic>> {
-  List<dynamic> items;
-
-  TupleComparing(this.items);
-
-  @override
-  int compareTo(List<dynamic> other) {
-    var cmp = 0;
-    for (List<dynamic> pair in zip([items, other])) {
-      // ignore: avoid_dynamic_calls
-      cmp = pair[0].compareTo(pair[1]);
-      if (cmp != 0) return cmp;
-    }
-    return cmp;
   }
 }
 
