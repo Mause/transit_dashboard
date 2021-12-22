@@ -28,6 +28,7 @@ import 'generated_code/journey_planner.enums.swagger.dart';
 import 'generated_code/journey_planner.swagger.dart'
     show JourneyPlanner, Stop, Trip, TripSummary;
 import 'transit.dart' show getClient, getRealtime;
+import 'tuple_comparing.dart';
 
 var awesomeNotifications = AwesomeNotifications();
 var logger = Logger('main.dart');
@@ -113,8 +114,14 @@ class _MyHomePageState extends State<MyHomePage> {
   String? routeNumber;
   String? stopNumber;
 
-  OrderedSet<Tuple2<Stop, Trip>> routeChoices = OrderedSet(Comparing.on(
-      (t) => Tuple2(t.item2.arriveTime, t.item2.summary!).hashCode));
+  OrderedSet<Tuple2<Stop, Trip>> routeChoices = OrderedSet(Comparing.on((t) {
+    String item1 = t.item2.arriveTime!;
+    TripSummary item2 = t.item2.summary!;
+    return TupleComparing([
+      item1,
+      TupleComparing([item2.hashCode, item2.direction!])
+    ]);
+  }));
 
   _MyHomePageState() {
     client = getClient(

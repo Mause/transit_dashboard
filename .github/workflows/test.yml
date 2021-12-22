@@ -45,6 +45,8 @@ jobs:
 
       - run: dart run --define=API_KEY=${{ secrets.API_KEY }} bin/transit_dashboard.dart
 
+      - run: flutter test
+
       - run: |
           flutter build apk \
             --dart-define=API_KEY=${{ secrets.API_KEY }} \
