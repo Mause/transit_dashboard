@@ -115,7 +115,7 @@ class _MyHomePageState extends State<MyHomePage> {
   String? stopNumber;
 
   OrderedSet<Tuple2<Stop, Trip>> routeChoices = OrderedSet(Comparing.on((t) {
-    String item1 = t.item2.arriveTime!;
+    String item1 = t.item2.arriveTime ?? '0000-00-00T00:00';
     TripSummary item2 = t.item2.summary!;
     return TupleComparing([
       item1,
