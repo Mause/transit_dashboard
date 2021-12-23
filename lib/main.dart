@@ -1,10 +1,11 @@
 import 'package:awesome_notifications/awesome_notifications.dart'
     show
         AwesomeNotifications,
+        NotificationActionButton,
         NotificationChannel,
-        NotificationLayout,
         NotificationChannelGroup,
-        NotificationContent;
+        NotificationContent,
+        NotificationLayout;
 import 'package:duration/duration.dart' show prettyDuration;
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart'
@@ -400,7 +401,10 @@ Future<void> update(String title, List<String> text) async =>
             title: title,
             summary: text[0],
             body: text.join('<br>'),
-            notificationLayout: NotificationLayout.BigText));
+            notificationLayout: NotificationLayout.BigText),
+        actionButtons: [
+          NotificationActionButton(key: 'dismiss', label: 'Dismiss')
+        ]);
 
 extension OrderedSetExt<E> on Iterable<E> {
   OrderedSet<E> toOrderedSet([int Function(E e1, E e2)? compare]) {
