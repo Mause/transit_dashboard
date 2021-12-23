@@ -233,7 +233,8 @@ class _MyHomePageState extends State<MyHomePage> {
             const LocationSettings(timeLimit: Duration(seconds: 30)));
 
     var stops = (await nearbyStops('eac7a147-0831-4fcf-8fa8-a5e8ffcfa039',
-            Location(loco.latitude, loco.longitude)))
+            Location(loco.latitude, loco.longitude),
+            isRealTimeChecked: true, returnNotes: true))
         .where((element) => element.trips!.isNotEmpty)
         .toList();
 
