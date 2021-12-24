@@ -147,10 +147,24 @@
   "components": {
     "responses": {
       "400": {
-        "$ref": "#/components/schemas/Error"
+        "description": "Error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
       },
       "401": {
-        "$ref": "#/components/schemas/Error"
+        "description": "Error",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/Error"
+            }
+          }
+        }
       }
     },
     "securitySchemes": {
