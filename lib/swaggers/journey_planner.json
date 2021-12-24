@@ -42,6 +42,21 @@
               "type": "string",
               "format": "date-time"
             }
+          },
+          {
+            "name": "TimeBand",
+            "in": "query",
+            "schema": {
+              "type": "number",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "FilterInactiveStops",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
           }
         ],
         "responses": {

@@ -15,6 +15,8 @@ Future<List<NearbyTransitStop>> nearbyStops(
           dataset: 'PerthRestricted',
           format: Format.json,
           time: getNowAsString(),
+          filterInactiveStops: true,
+          timeBand: 30,
           geoCoordinate: "${location.latitude},${location.longitude}"))
       .transitStopPaths!;
 }
