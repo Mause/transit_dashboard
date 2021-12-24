@@ -253,6 +253,10 @@
           "Status"
         ],
         "properties": {
+          "Request": {
+            "type": "object",
+            "additionalProperties": true
+          },
           "Status": {
             "$ref": "#/components/schemas/StatusResponse"
           }
