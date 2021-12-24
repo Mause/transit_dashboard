@@ -464,10 +464,12 @@
             "additionalProperties": true,
             "properties": {
               "ArrivalTime": {
-                "type": "date-time"
+                "type": "string",
+                "format": "date-time"
               },
               "ArriveTime": {
-                "type": "date-time"
+                "type": "string",
+                "format": "date-time"
               },
               "RealTimeInfo": {
                 "$ref": "#/components/schemas/RealTimeInfo"
