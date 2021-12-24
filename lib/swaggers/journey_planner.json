@@ -256,6 +256,9 @@
           "RouteName"
         ],
         "properties": {
+          "TripUid": {
+            "type": "string"
+          },
           "Headsign": {
             "type": "string"
           },
