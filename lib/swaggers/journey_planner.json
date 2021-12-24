@@ -73,6 +73,78 @@
         }
       }
     },
+    "/DataSets/{dataset}/Trip": {
+      "get": {
+        "parameters": [
+          {
+            "name": "dataset",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "TripUid",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "TripDate",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date"
+            }
+          },
+          {
+            "name": "ReturnNotes",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "IsRealTimeChecked",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "IsMappingDataReturned",
+            "in": "query",
+            "schema": {
+              "type": "boolean"
+            }
+          },
+          {
+            "name": "format",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Format"
+            },
+            "in": "query"
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TripResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/DataSets/{dataset}/StopTimetable": {
       "get": {
         "operationId": "getStopTimetable",
@@ -375,6 +447,32 @@
             }
           }
         }
+      },
+      "TripResponse": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Error"
+          },
+          {
+            "type": "object",
+            "additionalProperties": true,
+            "properties": {
+              "ArrivalTime": {
+                "type": "date-time"
+              },
+              "ArriveTime": {
+                "type": "date-time"
+              },
+              "RealTimeInfo": {
+                "$ref": "#/components/schemas/RealTimeInfo"
+              },
+              "Summary": {
+                "$ref": "#/components/schemas/TripSummary"
+              }
+            }
+          }
+        ]
       }
     }
   }
