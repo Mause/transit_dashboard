@@ -46,6 +46,7 @@
           {
             "name": "TimeBand",
             "in": "query",
+            "description": "Measured in minutes",
             "schema": {
               "type": "number",
               "format": "int32"
