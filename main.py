@@ -29,35 +29,33 @@ def trips_for_stop(stop_uid: str, time: datetime):
     )
 
     data = r.json()
-    print(data)
-    r = session.get(
-        "https://realtime.transperth.info/SJP/StopTimetableService.svc/DataSets/PerthRestricted/StopTimetable",
-        params={
-            "StopUID": "PerthRestricted:11706",
-            "IsRealTimeChecked": "true",
-            "ReturnNotes": "true",
-            "Time": time.isoformat(),
-        },
-    )
-
-    r = session.get(
-        "https://realtime.transperth.info/SJP/TripService.svc/DataSets/PerthRestricted/Trip",
-        params={
-            "TripUID": "PerthRestricted:11706",
-            "IsRealTimeChecked": "true",
-            "ReturnNotes": "true",
-            "Time": time.isoformat(),
-        },
-    )
-    print(r, r.reason, r.headers, repr(r.text))
 
     server_time = parse(r.headers["Date"])
 
     return (server_time, data["Trips"])
 
 
+def get_trip(trip_uid: str, time: datetime):
+    r = session.get(
+        "https://realtime.transperth.info/SJP/TripService.svc/DataSets/PerthRestricted/Trip",
+        params={
+            "TripUID": trip_uid,
+            "IsRealTimeChecked": "true",
+            "ReturnNotes": "true",
+            "Time": time.isoformat(),
+        },
+    )
+    data = r.json()
+
+    return data["TripStops"]
+
+
 def main():
-    server_time, trips = trips_for_stop("11706", datetime.now(tz=perth))
+    now = datetime.now(tz=perth)
+
+    server_time, trips = trips_for_stop("11706", now)
+
+    pprint(get_trip(trips[0]["Summary"]["TripUid"], now)[0])
 
     trips = [trip for trip in trips if trip["Summary"]["RouteCode"] == "101"]
     print("current_time:", datetime.now(tz=perth))
