@@ -21,7 +21,7 @@ def trips_for_stop(stop_uid: str, time: datetime):
     r = session.get(
         "https://realtime.transperth.info/SJP/StopTimetableService.svc/DataSets/PerthRestricted/StopTimetable",
         params={
-            "StopUID": "PerthRestricted:11706",
+            "StopUID": f"PerthRestricted:{stop_uid}",
             "IsRealTimeChecked": "true",
             "ReturnNotes": "true",
             "Time": time.isoformat(),
