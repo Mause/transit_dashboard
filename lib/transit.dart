@@ -121,7 +121,7 @@ T getClient<T extends ChopperService>(
 }
 
 tz.TZDateTime toDateTime(tz.TZDateTime now, String strung) {
-  assert(strung.length == 6, strung);
+  assert(strung.length == 8, strung);
 
   var parts = strung.split(':').map((e) => int.parse(e)).toList();
   return tz.TZDateTime(
