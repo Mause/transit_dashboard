@@ -452,6 +452,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.0.1"
+  nock:
+    dependency: "direct dev"
+    description:
+      name: nock
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.2.0"
   node_preamble:
     dependency: transitive
     description:

@@ -1,9 +1,10 @@
 // ignore_for_file: avoid_print
 
+import 'dart:async' show Future, FutureOr;
 import 'dart:convert' show JsonEncoder;
 
 import 'package:chopper/chopper.dart'
-    show ChopperClient, ChopperService, HeadersInterceptor;
+    show ChopperClient, ChopperService, ErrorConverter, HeadersInterceptor, Response, Converter;
 import 'package:intl/intl.dart';
 import 'package:logging/logging.dart' show Logger;
 import 'package:sentry/sentry.dart' show SentryHttpClient;
@@ -110,11 +111,24 @@ T getClient<T extends ChopperService>(
               sendDefaultPii: true),
           services: [baseClient],
           converter: baseClient.client.converter,
+          errorConverter: ErrorConvert(baseClient.client.converter!),
           interceptors: [
             HeadersInterceptor({'ApiKey': apiKey})
           ],
           baseUrl: baseUrl)
       .getService<T>();
+}
+
+class ErrorConvert extends ErrorConverter {
+  Converter converter;
+
+  ErrorConvert(this.converter);
+
+  @override
+  FutureOr<Response<dynamic>> convertError<BodyType, InnerType>(
+      Response<dynamic> response) async {
+    return await converter.convertResponse<BodyType, InnerType>(response);
+  }
 }
 
 tz.TZDateTime toDateTime(tz.TZDateTime now, String strung) {

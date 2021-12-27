@@ -71,6 +71,7 @@ dev_dependencies:
   test: '>=1.15.0 <2.0.0'
   chopper_generator: any
   swagger_dart_code_generator: any
+  nock: ^1.2.0
 
   # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
