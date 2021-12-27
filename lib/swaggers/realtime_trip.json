@@ -7,10 +7,10 @@
       "url": "http://journeyplanner.silverrailtech.com/JourneyPlanner/Help"
     }
   },
-  "host": "realtime.transperth.info",
-  "basePath": "/SJP/TripService.svc",
-  "schemes": [
-    "https"
+  "servers": [
+    {
+      "url": "https://realtime.transperth.info/SJP/TripService.svc"
+    }
   ],
   "paths": {
     "/DataSets/{dataset}/Trip": {
@@ -89,7 +89,7 @@
             "name": "format",
             "required": true,
             "schema": {
-              "$ref": "/components/schemas/Format"
+              "$ref": "#/components/schemas/Format"
             },
             "in": "query"
           }
@@ -100,7 +100,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "/components/schemas/TripResponse"
+                  "$ref": "#/components/schemas/TripResponse"
                 }
               }
             }
