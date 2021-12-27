@@ -4,7 +4,13 @@ import 'dart:async' show Future, FutureOr;
 import 'dart:convert' show JsonEncoder;
 
 import 'package:chopper/chopper.dart'
-    show ChopperClient, ChopperService, ErrorConverter, HeadersInterceptor, Response, Converter;
+    show
+        ChopperClient,
+        ChopperService,
+        Converter,
+        ErrorConverter,
+        Request,
+        Response;
 import 'package:intl/intl.dart';
 import 'package:logging/logging.dart' show Logger;
 import 'package:sentry/sentry.dart' show SentryHttpClient;
@@ -113,7 +119,9 @@ T getClient<T extends ChopperService>(
           converter: baseClient.client.converter,
           errorConverter: ErrorConvert(baseClient.client.converter!),
           interceptors: [
-            HeadersInterceptor({'ApiKey': apiKey})
+            (Request request) => request.copyWith(
+                parameters: request.parameters
+                  ..putIfAbsent('ApiKey', () => apiKey))
           ],
           baseUrl: baseUrl)
       .getService<T>();
