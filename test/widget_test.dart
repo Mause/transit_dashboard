@@ -6,13 +6,26 @@
 // tree, read text, and verify that the values of widget properties are correct.
 
 // import 'package:flutter/material.dart';
-import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_test/flutter_test.dart'
+    show equals, expect, setUp, tearDown, test, isNotNull;
+import 'package:nock/nock.dart' show nock;
 import 'package:ordered_set/comparing.dart';
-
+import 'package:transit_dashboard/generated_code/client_index.dart'
+    show JourneyPlanner;
+import 'package:transit_dashboard/generated_code/journey_planner.enums.swagger.dart'
+    show Format;
+import 'package:transit_dashboard/transit.dart';
 import 'package:transit_dashboard/tuple_comparing.dart';
 import 'package:tuple/tuple.dart';
 
 void main() {
+  setUp(() {
+    nock.init();
+  });
+  tearDown(() {
+    nock.cleanAll();
+  });
+
 /*
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
@@ -45,5 +58,27 @@ void main() {
           Tuple2(1, 1),
           Tuple2(1, 2),
         ]));
+  });
+
+  test('error parsing', () async {
+    var client = getClient(JourneyPlanner.create, 'http://localhost', 'apiKey');
+
+    nock('http://localhost').get('/DataSets/dataset/NearbyTransitStops?format=json&GeoCoordinate=-32%2C115&ApiKey=apiKey').reply(400, {
+      'Status': {
+        'Severity': 2,
+        'Details': [
+          {
+            'Code': 1,
+            'Message': 'Hello world'
+          }
+        ]
+      }
+    });
+
+    var response = await client.dataSetsDatasetNearbyTransitStopsGet(
+        dataset: 'dataset', format: Format.json, geoCoordinate: '-32,115');
+
+    expect(response, isNotNull);
+    expect(response.body?.status, isNotNull);
   });
 }
