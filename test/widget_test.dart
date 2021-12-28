@@ -7,13 +7,25 @@
 
 // import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart'
-    show equals, expect, isNotNull, isNull, setUp, tearDown, test;
+    show
+        Offset,
+        equals,
+        expect,
+        find,
+        findsOneWidget,
+        isNotNull,
+        isNull,
+        setUp,
+        tearDown,
+        test,
+        testWidgets;
 import 'package:nock/nock.dart' show nock;
 import 'package:ordered_set/comparing.dart';
 import 'package:transit_dashboard/generated_code/client_index.dart'
     show JourneyPlanner;
 import 'package:transit_dashboard/generated_code/journey_planner.enums.swagger.dart'
     show Format;
+import 'package:transit_dashboard/main.dart';
 import 'package:transit_dashboard/transit.dart';
 import 'package:transit_dashboard/tuple_comparing.dart';
 import 'package:tuple/tuple.dart';
@@ -81,5 +93,17 @@ void main() {
     expect(response, isNotNull);
     expect(response.error, isNull);
     expect(response.body?.status?.severity, equals(2));
+  });
+
+  testWidgets('TestApp', (tester) async {
+    await tester.pumpWidget(const MyApp());
+
+    var text = find.text('Pull to load nearby trips');
+    expect(text, findsOneWidget);
+
+    var gesture = await tester.startGesture(tester.getCenter(text));
+    await gesture.moveBy(const Offset(0, 300));
+
+    await tester.pumpAndSettle();
   });
 }
