@@ -21,15 +21,16 @@ import 'package:sentry_flutter/sentry_flutter.dart'
 import 'package:sentry_logging/sentry_logging.dart' show LoggingIntegration;
 import 'package:timezone/data/latest.dart' show initializeTimeZones;
 import 'package:timezone/standalone.dart' show TZDateTime, getLocation;
-import 'generated_code/realtime_trip.swagger.dart' show RealtimeTrip;
 import 'package:transit_dashboard/journey_planner_service.dart'
     show Location, nearbyStops;
 import 'package:tuple/tuple.dart';
 
+import 'generated_code/client_index.dart' show JourneyPlanner, RealtimeTrip;
 import 'generated_code/journey_planner.enums.swagger.dart';
 import 'generated_code/journey_planner.swagger.dart'
-    show JourneyPlanner, Stop, Trip, TripSummary;
-import 'transit.dart' show getClient, getRealtime, getRealtimeTripService;
+    show Stop, Trip, TripSummary;
+import 'transit.dart'
+    show getClient, getRealtime, getRealtimeTripService, getTripStop;
 import 'tuple_comparing.dart';
 
 var awesomeNotifications = AwesomeNotifications();
@@ -247,14 +248,17 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
-  Future<void> showNotification(Stop transitStop, Trip trip) async {
-    if (trip.arriveTime == null) {
+  Future<void> showNotification(Stop transitStop, Trip scheduledTrip) async {
+    var trip =
+        await getTripStop(realtimeTripService, scheduledTrip, transitStop.code);
+
+    if (trip.arrivalTime == null) {
       throw Exception('missing arrive time on ${trip.toJson()}');
     }
 
     setState(() {
       stopNumber = transitStop.code! + " " + transitStop.description!;
-      routeNumber = trip.summary!.makeSummary();
+      routeNumber = scheduledTrip.summary!.makeSummary();
     });
 
     while (true) {
@@ -265,7 +269,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
       // for now, we're assuming the realtime doesn't change
       var realtime = getRealtime(now, trip.realTimeInfo);
-      var scheduled = TZDateTime.parse(perth, trip.arriveTime!);
+      var scheduled = TZDateTime.from(trip.arrivalTime!, perth);
       var datetime = realtime ?? scheduled;
 
       var delta = datetime.difference(now);

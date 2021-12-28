@@ -17,16 +17,9 @@ import 'package:sentry/sentry.dart' show SentryHttpClient;
 import 'package:timezone/standalone.dart' as tz;
 import 'package:transit_dashboard/errors.dart' show errorOrResult;
 import 'package:transit_dashboard/loggers.dart' show setupLogging;
-import 'package:tuple/tuple.dart';
 
 import 'generated_code/journey_planner.swagger.dart'
-    show
-        Format,
-        JourneyPlanner,
-        RealTimeInfo,
-        Stop,
-        StopTimetableResponse,
-        Trip;
+    show Format, JourneyPlanner, StopTimetableResponse, Trip;
 import 'generated_code/realtime_trip.swagger.dart' as rtt;
 import 'journey_planner_service.dart' show Location, nearbyStops;
 
@@ -36,7 +29,6 @@ var dataset = 'PerthRestricted';
 
 Future<void> main() async {
   await tz.initializeTimeZone();
-  var perth = tz.getLocation('Australia/Perth');
   setupLogging();
 
   var location = Location(-31.951548099520902, 115.85798556027436);
@@ -46,56 +38,14 @@ Future<void> main() async {
   logger.info('stops: ${stops.length}');
   logger.info('trips: ${stops[0].trips?.length}');
 
-  JourneyPlanner client = getClient(
-      JourneyPlanner.create,
-      // "http://au-journeyplanner.silverrailtech.com/journeyplannerservice/v2/REST",
-      "http://realtime.transperth.info/SJP/StopTimetableService.svc/",
-      // apiKey
-      "ad89905f-d5a7-487f-a876-db39092c6ee0");
+  rtt.RealtimeTrip tripClient = getRealtimeTripService();
 
-  var now = tz.TZDateTime.now(perth);
+  var stop = stops[0];
+  var stopCode = stop.transitStop!.code;
+  var trip = stop.trips![0];
 
-  Set<Tuple2<Stop, Trip>> nearbyBuses = (await Future.wait(stops
-          .map((stop) => getStopTimetable(client, stop.transitStop!.code!))))
-      .where((element) {
-        if (element.trips == null) {
-          logger.warning('${element.toJson()} has no trips');
-        }
-        return element.trips != null;
-      })
-      .expand((element) =>
-          element.trips!.map((e) => Tuple2(element.requestedStop!, e)))
-      .where((element) {
-        var good = getRealtime(now, element.item2.realTimeInfo) != null;
-        if (!good) {
-          logger.warning('${element.item2.toJson()} has no real time info');
-        }
-        return good;
-      })
-      .toSet();
-
-  print(json.convert({
-    'closest': nearbyBuses.map((e) => e.item1.description).toSet().toList()
-  }));
-  var nearbyBus = nearbyBuses.first;
-
-  var realTimeInfo = nearbyBus.item2.realTimeInfo!;
-  tz.TZDateTime? arrivalDateTime = getRealtime(now, realTimeInfo);
-
-  assert(arrivalDateTime != null, "Arrival time must exist");
-
-  print({
-    "now": now,
-    "realTimeInfo": realTimeInfo.toJson(),
-    "arrivalDateTime": arrivalDateTime
-  });
-
-  createNotification(
-      nearbyBus.item1.description!,
-      nearbyBus.item2.summary!.routeCode! +
-          ' ' +
-          nearbyBus.item2.summary!.headsign!,
-      now.difference(arrivalDateTime!));
+  var tripStop = await getTripStop(tripClient, trip, stopCode);
+  print(tripStop.realTimeInfo?.toJson());
 }
 
 rtt.RealtimeTrip getRealtimeTripService() {
@@ -105,7 +55,20 @@ rtt.RealtimeTrip getRealtimeTripService() {
       "ad89905f-d5a7-487f-a876-db39092c6ee0");
 }
 
-tz.TZDateTime? getRealtime(tz.TZDateTime now, RealTimeInfo? realTimeInfo) {
+Future<rtt.TripStop> getTripStop(
+    rtt.RealtimeTrip tripClient, Trip trip, String? stopCode) async {
+  var realtimeTrip = (await tripClient.dataSetsDatasetTripGet(
+      dataset: dataset,
+      isRealTimeChecked: true,
+      tripUid: trip.summary!.tripUid!,
+      tripDate: trip.arriveTime!,
+      format: rtt.Format.json));
+
+  return realtimeTrip.body!.tripStops!
+      .firstWhere((element) => element.transitStop!.code == stopCode);
+}
+
+tz.TZDateTime? getRealtime(tz.TZDateTime now, rtt.RealTimeInfo? realTimeInfo) {
   if (realTimeInfo?.estimatedArrivalTime != null) {
     return toDateTime(now, realTimeInfo!.estimatedArrivalTime!);
   } else if (realTimeInfo?.actualArrivalTime != null) {
