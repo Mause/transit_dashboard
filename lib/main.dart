@@ -286,6 +286,12 @@ class TripTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    var perth = getLocation('Australia/Perth');
+    var difference = trip.arriveTime == null
+        ? null
+        : prettyDuration(TZDateTime.parse(perth, trip.arriveTime!)
+            .difference(TZDateTime.now(perth)));
+
     return Card(
         elevation: 18.0,
         child: Column(
@@ -299,7 +305,10 @@ class TripTile extends StatelessWidget {
                 subtitle: Text('Mode: ' +
                     (trip.summary?.mode?.name ?? 'Unknown') +
                     ', Time: ' +
-                    (trip.arriveTime ?? 'Unknown'))),
+                    (trip.arriveTime ?? 'Unknown') +
+                    ', ' +
+                    (difference ?? 'Unknown') +
+                    ' away accourding to the scheduled arrival time')),
             ButtonBar(
               children: [
                 ElevatedButton(
