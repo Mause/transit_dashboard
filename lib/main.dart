@@ -111,21 +111,6 @@ class MyHomePage extends StatefulWidget {
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
-enum TimeSource { scheduled, actual, estimated }
-
-Tuple2<TimeSource, String>? getArrivalTime(Trip trip) {
-  if (trip.realTimeInfo?.actualArrivalTime != null) {
-    return Tuple2(TimeSource.actual, trip.realTimeInfo!.actualArrivalTime!);
-  } else if (trip.realTimeInfo?.estimatedArrivalTime != null) {
-    return Tuple2(
-        TimeSource.estimated, trip.realTimeInfo!.estimatedArrivalTime!);
-  } else if (trip.arriveTime != null) {
-    return Tuple2(TimeSource.scheduled, trip.arriveTime!);
-  } else {
-    return null;
-  }
-}
-
 class _MyHomePageState extends State<MyHomePage> {
   JourneyPlanner client;
   RealtimeTrip realtimeTripService;
@@ -134,7 +119,7 @@ class _MyHomePageState extends State<MyHomePage> {
   String? stopNumber;
 
   OrderedSet<Tuple2<Stop, Trip>> routeChoices = OrderedSet(Comparing.on((t) {
-    String item1 = getArrivalTime(t.item2)?.item2 ?? '0000-00-00T00:00';
+    String item1 = t.item2.arriveTime ?? '0000-00-00T00:00';
     TripSummary item2 = t.item2.summary!;
     return TupleComparing([
       item1,
@@ -319,7 +304,7 @@ class TripTile extends StatelessWidget {
                 subtitle: Text('Mode: ' +
                     (trip.summary?.mode?.name ?? 'Unknown') +
                     ', Time: ' +
-                    (getArrivalTime(trip)?.toList().join(", ") ?? 'Unknown'))),
+                    (trip.arriveTime ?? 'Unknown'))),
             ButtonBar(
               children: [
                 ElevatedButton(
