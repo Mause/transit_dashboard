@@ -229,11 +229,9 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Future<void> showNotification(Stop transitStop, Trip scheduledTrip) async {
-    var trip =
-        await getTripStop(realtimeTripService, scheduledTrip, transitStop.code);
-
-    if (trip.arrivalTime == null) {
-      throw Exception('missing arrive time on ${trip.toJson()}');
+    if (scheduledTrip.arriveTime == null) {
+      throw Exception(
+          'missing arrive time on ${scheduledTrip.summary!.makeSummary()}');
     }
 
     setState(() {
@@ -247,7 +245,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
       var content = <String>[];
 
-      // for now, we're assuming the realtime doesn't change
+      var trip = await getTripStop(
+          realtimeTripService, scheduledTrip, transitStop.code);
+
       var realtime = getRealtime(now, trip.realTimeInfo);
       var scheduled = TZDateTime.from(trip.arrivalTime!, perth);
       var datetime = realtime ?? scheduled;
