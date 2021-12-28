@@ -117,7 +117,7 @@ T getClient<T extends ChopperService>(
               sendDefaultPii: true),
           services: [baseClient],
           converter: baseClient.client.converter,
-          errorConverter: ErrorConvert(baseClient.client.converter!),
+          // errorConverter: ErrorConvert(baseClient.client.converter!),
           interceptors: [
             (Request request) => request.copyWith(
                 parameters: request.parameters

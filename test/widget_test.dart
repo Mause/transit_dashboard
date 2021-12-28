@@ -7,7 +7,7 @@
 
 // import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart'
-    show equals, expect, setUp, tearDown, test, isNotNull;
+    show equals, expect, isNotNull, isNull, setUp, tearDown, test;
 import 'package:nock/nock.dart' show nock;
 import 'package:ordered_set/comparing.dart';
 import 'package:transit_dashboard/generated_code/client_index.dart'
@@ -63,14 +63,14 @@ void main() {
   test('error parsing', () async {
     var client = getClient(JourneyPlanner.create, 'http://localhost', 'apiKey');
 
-    nock('http://localhost').get('/DataSets/dataset/NearbyTransitStops?format=json&GeoCoordinate=-32%2C115&ApiKey=apiKey').reply(400, {
+    nock('http://localhost')
+        .get(
+            '/DataSets/dataset/NearbyTransitStops?format=json&GeoCoordinate=-32%2C115&ApiKey=apiKey')
+        .reply(200, {
       'Status': {
         'Severity': 2,
         'Details': [
-          {
-            'Code': 1,
-            'Message': 'Hello world'
-          }
+          {'Code': 1, 'Message': 'Hello world'}
         ]
       }
     });
@@ -79,6 +79,7 @@ void main() {
         dataset: 'dataset', format: Format.json, geoCoordinate: '-32,115');
 
     expect(response, isNotNull);
-    expect(response.body?.status, isNotNull);
+    expect(response.error, isNull);
+    expect(response.body?.status?.severity, equals(2));
   });
 }
