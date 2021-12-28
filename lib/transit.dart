@@ -27,6 +27,7 @@ import 'generated_code/journey_planner.swagger.dart'
         Stop,
         StopTimetableResponse,
         Trip;
+import 'generated_code/realtime_trip.swagger.dart' as rtt;
 import 'journey_planner_service.dart' show Location, nearbyStops;
 
 var json = const JsonEncoder.withIndent('  ');
@@ -95,6 +96,13 @@ Future<void> main() async {
           ' ' +
           nearbyBus.item2.summary!.headsign!,
       now.difference(arrivalDateTime!));
+}
+
+rtt.RealtimeTrip getRealtimeTripService() {
+  return getClient(
+      rtt.RealtimeTrip.create,
+      "http://realtime.transperth.info/SJP/TripService.svc/",
+      "ad89905f-d5a7-487f-a876-db39092c6ee0");
 }
 
 tz.TZDateTime? getRealtime(tz.TZDateTime now, RealTimeInfo? realTimeInfo) {

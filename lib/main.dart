@@ -21,6 +21,7 @@ import 'package:sentry_flutter/sentry_flutter.dart'
 import 'package:sentry_logging/sentry_logging.dart' show LoggingIntegration;
 import 'package:timezone/data/latest.dart' show initializeTimeZones;
 import 'package:timezone/standalone.dart' show TZDateTime, getLocation;
+import 'generated_code/realtime_trip.swagger.dart' show RealtimeTrip;
 import 'package:transit_dashboard/journey_planner_service.dart'
     show Location, nearbyStops;
 import 'package:tuple/tuple.dart';
@@ -28,7 +29,7 @@ import 'package:tuple/tuple.dart';
 import 'generated_code/journey_planner.enums.swagger.dart';
 import 'generated_code/journey_planner.swagger.dart'
     show JourneyPlanner, Stop, Trip, TripSummary;
-import 'transit.dart' show getClient, getRealtime;
+import 'transit.dart' show getClient, getRealtime, getRealtimeTripService;
 import 'tuple_comparing.dart';
 
 var awesomeNotifications = AwesomeNotifications();
@@ -126,6 +127,7 @@ Tuple2<TimeSource, String>? getArrivalTime(Trip trip) {
 
 class _MyHomePageState extends State<MyHomePage> {
   JourneyPlanner client;
+  RealtimeTrip realtimeTripService;
 
   String? routeNumber;
   String? stopNumber;
@@ -144,7 +146,8 @@ class _MyHomePageState extends State<MyHomePage> {
       : client = getClient(
             JourneyPlanner.create,
             "http://realtime.transperth.info/SJP/StopTimetableService.svc/",
-            "ad89905f-d5a7-487f-a876-db39092c6ee0");
+            "ad89905f-d5a7-487f-a876-db39092c6ee0"),
+        realtimeTripService = getRealtimeTripService();
 
   @override
   Widget build(BuildContext context) {
