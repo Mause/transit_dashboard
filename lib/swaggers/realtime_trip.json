@@ -212,6 +212,9 @@
             "type": "string",
             "format": "date-time"
           },
+          "RealTimeInfo": {
+            "$ref": "#/components/schemas/RealTimeInfo"
+          },
           "ArrivalTime": {
             "type": "string",
             "format": "date-time"
@@ -393,9 +396,6 @@
               "ArriveTime": {
                 "type": "string",
                 "format": "date-time"
-              },
-              "RealTimeInfo": {
-                "$ref": "#/components/schemas/RealTimeInfo"
               },
               "TripStops": {
                 "type": "array",
