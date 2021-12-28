@@ -22,15 +22,14 @@ import 'package:sentry_logging/sentry_logging.dart' show LoggingIntegration;
 import 'package:timezone/data/latest.dart' show initializeTimeZones;
 import 'package:timezone/standalone.dart' show TZDateTime, getLocation;
 import 'package:transit_dashboard/journey_planner_service.dart'
-    show Location, nearbyStops;
+    show Location, getJourneyPlannerService, nearbyStops;
 import 'package:tuple/tuple.dart';
 
 import 'generated_code/client_index.dart' show JourneyPlanner, RealtimeTrip;
 import 'generated_code/journey_planner.enums.swagger.dart';
 import 'generated_code/journey_planner.swagger.dart'
     show Stop, Trip, TripSummary;
-import 'transit.dart'
-    show getClient, getRealtime, getRealtimeTripService, getTripStop;
+import 'transit.dart' show getRealtime, getRealtimeTripService, getTripStop;
 import 'tuple_comparing.dart';
 
 var awesomeNotifications = AwesomeNotifications();
@@ -129,10 +128,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }));
 
   _MyHomePageState()
-      : client = getClient(
-            JourneyPlanner.create,
-            "http://realtime.transperth.info/SJP/StopTimetableService.svc/",
-            "ad89905f-d5a7-487f-a876-db39092c6ee0"),
+      : client = getJourneyPlannerService(),
         realtimeTripService = getRealtimeTripService();
 
   @override
@@ -221,8 +217,7 @@ class _MyHomePageState extends State<MyHomePage> {
         locationSettings:
             const LocationSettings(timeLimit: Duration(seconds: 30)));
 
-    var stops = (await nearbyStops('eac7a147-0831-4fcf-8fa8-a5e8ffcfa039',
-            Location(loco.latitude, loco.longitude)))
+    var stops = (await nearbyStops(Location(loco.latitude, loco.longitude)))
         .where((element) => element.trips!.isNotEmpty)
         .toList();
 

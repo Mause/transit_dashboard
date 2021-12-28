@@ -33,8 +33,7 @@ Future<void> main() async {
 
   var location = Location(-31.951548099520902, 115.85798556027436);
 
-  var apiKey = 'eac7a147-0831-4fcf-8fa8-a5e8ffcfa039';
-  var stops = await nearbyStops(apiKey, location);
+  var stops = await nearbyStops(location);
   logger.info('stops: ${stops.length}');
   logger.info('trips: ${stops[0].trips?.length}');
 
