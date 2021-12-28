@@ -8,7 +8,9 @@
 	},
 
 	// Set *default* container specific settings.json values on container create.
-	"settings": {},
+	"settings": {
+		"terminal.integrated.defaultProfile.linux": "fish"
+	},
 
 	// Add the IDs of extensions you want installed when the container is created.
 	"extensions": ["dart-code.dart-code", "dart-code.flutter"],
