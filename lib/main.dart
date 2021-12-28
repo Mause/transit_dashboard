@@ -38,7 +38,7 @@ var logger = Logger('main.dart');
 
 void main() async {
   const sentryDsn = String.fromEnvironment('SENTRY_DSN');
-  if (sentryDsn.isEmpty) {
+  if (sentryDsn.isNotEmpty) {
     await SentryFlutter.init((options) {
       options.dsn = sentryDsn;
       options.tracesSampleRate = 1.0;
