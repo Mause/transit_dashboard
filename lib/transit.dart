@@ -31,6 +31,7 @@ import 'journey_planner_service.dart' show Location, nearbyStops;
 
 var json = const JsonEncoder.withIndent('  ');
 var logger = Logger('transit.dart');
+var dataset = 'PerthRestricted';
 
 Future<void> main() async {
   await tz.initializeTimeZone();
@@ -156,8 +157,8 @@ Future<StopTimetableResponse> getStopTimetable(
   var time = getNowAsString();
 
   return errorOrResult(await client.dataSetsDatasetStopTimetableGet(
-      dataset: 'PerthRestricted',
-      stop: "PerthRestricted:$stopNumber",
+      dataset: dataset,
+      stop: "$dataset:$stopNumber",
       isRealTimeChecked: true,
       returnNotes: true,
       time: time,

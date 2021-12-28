@@ -2,7 +2,7 @@ import 'package:transit_dashboard/errors.dart' show errorOrResult;
 
 import 'generated_code/journey_planner.swagger.dart'
     show JourneyPlanner, Format, NearbyTransitStop;
-import 'transit.dart' show getClient, getNowAsString;
+import 'transit.dart' show dataset, getClient, getNowAsString;
 
 Future<List<NearbyTransitStop>> nearbyStops(
     String apikey, Location location) async {
@@ -12,7 +12,7 @@ Future<List<NearbyTransitStop>> nearbyStops(
       apikey);
 
   return errorOrResult(await client.dataSetsDatasetNearbyTransitStopsGet(
-          dataset: 'PerthRestricted',
+          dataset: dataset,
           format: Format.json,
           time: getNowAsString(),
           filterInactiveStops: true,
