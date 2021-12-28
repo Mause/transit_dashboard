@@ -125,7 +125,7 @@ Tuple2<TimeSource, String>? getArrivalTime(Trip trip) {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  late JourneyPlanner client;
+  JourneyPlanner client;
 
   String? routeNumber;
   String? stopNumber;
@@ -140,12 +140,11 @@ class _MyHomePageState extends State<MyHomePage> {
     ]);
   }));
 
-  _MyHomePageState() {
-    client = getClient(
-        JourneyPlanner.create,
-        "http://realtime.transperth.info/SJP/StopTimetableService.svc/",
-        "ad89905f-d5a7-487f-a876-db39092c6ee0");
-  }
+  _MyHomePageState()
+      : client = getClient(
+            JourneyPlanner.create,
+            "http://realtime.transperth.info/SJP/StopTimetableService.svc/",
+            "ad89905f-d5a7-487f-a876-db39092c6ee0");
 
   @override
   Widget build(BuildContext context) {
@@ -249,11 +248,10 @@ class _MyHomePageState extends State<MyHomePage> {
     if (trip.arriveTime == null) {
       throw Exception('missing arrive time on ${trip.toJson()}');
     }
-    var summary = trip.summary!;
 
     setState(() {
       stopNumber = transitStop.code! + " " + transitStop.description!;
-      routeNumber = summary.makeSummary();
+      routeNumber = trip.summary!.makeSummary();
     });
 
     while (true) {
