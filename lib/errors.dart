@@ -6,6 +6,9 @@ import 'package:transit_dashboard/generated_code/journey_planner.swagger.dart'
 var logger = Logger("errors.dart");
 
 T errorOrResult<T extends Error>(Response<T> res) {
+  if (res.error != null) {
+    throw Exception(res.error);
+  }
   var status = res.body!.status!;
   var severity = status.severity;
   if (severity == 2) {
