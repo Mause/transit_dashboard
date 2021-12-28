@@ -1,0 +1,36 @@
+on:
+  schedule:
+    - cron: 0 0 * * *
+  workflow_dispatch: {}
+
+name: Update flutter dependencies
+jobs:
+  update:
+    name: Update flutter dependencies
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Cache Flutter dependencies
+        uses: actions/cache@v2
+        with:
+          path: /opt/hostedtoolcache/flutter
+          key: ${{ runner.OS }}-flutter-install-cache-${{ env.flutter_version }}-${{ hashFiles('pubspec.lock') }}
+
+      - uses: subosito/flutter-action@v1
+        with:
+          channel: beta
+      - name: Install dependencies
+        run: flutter pub get
+      - name: Update openapi swagger
+        uses: technote-space/create-pr-action@v2
+        with:
+          EXECUTE_COMMANDS: |
+            flutter pub upgrade --major-versions
+          COMMIT_MESSAGE: "chore: update flutter dependencies"
+          COMMIT_NAME: "GitHub Actions"
+          COMMIT_EMAIL: "example@example.com"
+          PR_BRANCH_NAME: "chore-flutter-dependencies"
+          PR_TITLE: "chore: update flutter dependencies"
+          GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
+
