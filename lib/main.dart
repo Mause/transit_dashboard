@@ -29,7 +29,8 @@ import 'generated_code/client_index.dart' show JourneyPlanner, RealtimeTrip;
 import 'generated_code/journey_planner.enums.swagger.dart';
 import 'generated_code/journey_planner.swagger.dart'
     show Stop, Trip, TripSummary;
-import 'transit.dart' show getRealtime, getRealtimeTripService, getTripStop;
+import 'transit.dart'
+    show getNow, getRealtime, getRealtimeTripService, getTripStop;
 import 'tuple_comparing.dart';
 
 var awesomeNotifications = AwesomeNotifications();
@@ -243,7 +244,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
     while (true) {
       var perth = getLocation('Australia/Perth');
-      var now = TZDateTime.now(perth);
+      var now = getNow();
 
       var content = <String>[];
 
@@ -291,8 +292,8 @@ class TripTile extends StatelessWidget {
     var perth = getLocation('Australia/Perth');
     var difference = trip.arriveTime == null
         ? null
-        : prettyDuration(TZDateTime.parse(perth, trip.arriveTime!)
-            .difference(TZDateTime.now(perth)));
+        : prettyDuration(
+            TZDateTime.parse(perth, trip.arriveTime!).difference(getNow()));
 
     return Card(
         elevation: 18.0,

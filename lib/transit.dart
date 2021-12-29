@@ -135,5 +135,5 @@ Future<StopTimetableResponse> getStopTimetable(
       format: Format.json));
 }
 
-String getNowAsString() => DateFormat('yyyy-MM-ddTHH:mm')
-    .format(tz.TZDateTime.now(tz.getLocation('Australia/Perth')));
+String getNowAsString() => DateFormat('yyyy-MM-ddTHH:mm').format(getNow());
+tz.TZDateTime getNow() => tz.TZDateTime.now(tz.getLocation('Australia/Perth'));
