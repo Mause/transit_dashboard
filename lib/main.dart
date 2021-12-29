@@ -36,6 +36,9 @@ var awesomeNotifications = AwesomeNotifications();
 var logger = Logger('main.dart');
 
 void main() async {
+  Get.isLogEnable = true;
+  Get.log = (message, {bool isError = false}) =>
+      logger.log(isError ? Level.SHOUT : Level.INFO, message);
   const sentryDsn = String.fromEnvironment('SENTRY_DSN');
   if (sentryDsn.isNotEmpty) {
     await SentryFlutter.init((options) {
