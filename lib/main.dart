@@ -11,8 +11,9 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart'
     show GeolocatorPlatform, LocationPermission, LocationSettings;
 import 'package:get/get.dart' show Get, GetMaterialApp, ExtensionSnackbar;
+import 'package:intl/date_symbol_data_local.dart' show initializeDateFormatting;
 import 'package:intl/intl.dart' show DateFormat, Intl;
-import 'package:logging/logging.dart';
+import 'package:logging/logging.dart' show Level, Logger;
 import 'package:material_you_colours/material_you_colours.dart'
     show getMaterialYouThemeData;
 import 'package:ordered_set/comparing.dart' show Comparing;
@@ -40,6 +41,7 @@ var logger = Logger('main.dart');
 
 void main() async {
   Intl.defaultLocale = 'en_AU';
+  await initializeDateFormatting();
 
   Get.isLogEnable = true;
   Get.log = (message, {bool isError = false}) =>
