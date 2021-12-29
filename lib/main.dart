@@ -11,11 +11,13 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart'
     show GeolocatorPlatform, LocationPermission, LocationSettings;
 import 'package:get/get.dart' show Get, GetMaterialApp, ExtensionSnackbar;
+import 'package:intl/intl.dart' show DateFormat, Intl;
 import 'package:logging/logging.dart';
 import 'package:material_you_colours/material_you_colours.dart'
     show getMaterialYouThemeData;
 import 'package:ordered_set/comparing.dart' show Comparing;
 import 'package:ordered_set/ordered_set.dart' show OrderedSet;
+import 'package:quiver/core.dart' show Optional;
 import 'package:sentry_flutter/sentry_flutter.dart'
     show Sentry, SentryFlutter, SentryNavigatorObserver;
 import 'package:sentry_logging/sentry_logging.dart' show LoggingIntegration;
@@ -37,6 +39,8 @@ var awesomeNotifications = AwesomeNotifications();
 var logger = Logger('main.dart');
 
 void main() async {
+  Intl.defaultLocale = 'en_AU';
+
   Get.isLogEnable = true;
   Get.log = (message, {bool isError = false}) =>
       logger.log(isError ? Level.SHOUT : Level.INFO, message);
@@ -289,12 +293,6 @@ class TripTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var perth = getLocation('Australia/Perth');
-    var difference = trip.arriveTime == null
-        ? null
-        : prettyDuration(
-            TZDateTime.parse(perth, trip.arriveTime!).difference(getNow()));
-
     return Card(
         elevation: 18.0,
         child: Column(
@@ -307,10 +305,11 @@ class TripTile extends StatelessWidget {
                 title: Text(trip.summary!.makeSummary()),
                 subtitle: Text('Mode: ' +
                     unknown(trip.summary?.mode?.name) +
-                    ', Time: ' +
-                    unknown(trip.arriveTime))),
-            Text(
-                'Scheduled at ${unknown(trip.arriveTime)}, running ${unknown(difference)} late'),
+                    ', scheduled at ' +
+                    Optional.fromNullable(trip.arriveTime)
+                        .transform(
+                            (e) => DateFormat.jm().format(DateTime.parse(e)))
+                        .or('Unknown'))),
             ButtonBar(
               children: [
                 ElevatedButton(
