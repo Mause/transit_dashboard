@@ -163,7 +163,6 @@ class _MyHomePageState extends State<MyHomePage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
             Text('Selected stop: $stopNumber, route: $routeNumber'),
-            Text('Sentry enabled: ${Sentry.isEnabled}'),
             Expanded(
                 child: RefreshIndicator(
                     onRefresh: reload,
