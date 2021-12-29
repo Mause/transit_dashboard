@@ -303,12 +303,11 @@ class TripTile extends StatelessWidget {
                 leading: getIcon(trip.summary!),
                 title: Text(trip.summary!.makeSummary()),
                 subtitle: Text('Mode: ' +
-                    (trip.summary?.mode?.name ?? 'Unknown') +
+                    unknown(trip.summary?.mode?.name) +
                     ', Time: ' +
-                    (trip.arriveTime ?? 'Unknown') +
-                    ', ' +
-                    (difference ?? 'Unknown') +
-                    ' away accourding to the scheduled arrival time')),
+                    unknown(trip.arriveTime))),
+            Text(
+                'Scheduled at ${unknown(trip.arriveTime)}, running ${unknown(difference)} late'),
             ButtonBar(
               children: [
                 ElevatedButton(
@@ -408,3 +407,5 @@ extension OrderedSetExt<E> on Iterable<E> {
     return orderedSet;
   }
 }
+
+String unknown(String? thing) => thing ?? 'Unknown';
