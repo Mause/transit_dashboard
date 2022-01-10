@@ -62,7 +62,7 @@ jobs:
       - name: Verify formatting
         run: flutter format --output=none --set-exit-if-changed .
 
-      - run: mv build/app/outputs/flutter-apk/app-release.apk me.mause.transit_dashboard-1.0.0+${{ github.run_number }}.apk
+      - run: mv build/app/outputs/flutter-apk/app-release.apk me.mause.transit_dashboard_${{ github.run_number }}.apk
 
       - uses: actions/upload-artifact@v2
         with:
