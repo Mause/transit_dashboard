@@ -28,7 +28,9 @@ import 'package:timezone/standalone.dart' show TZDateTime, getLocation;
 import 'package:transit_dashboard/journey_planner_service.dart'
     show Location, getJourneyPlannerService, nearbyStops;
 import 'package:tuple/tuple.dart';
+import 'package:workmanager/workmanager.dart' show Workmanager;
 
+import 'background.dart' show Job, SHOW_NOTIFICATION;
 import 'generated_code/client_index.dart' show JourneyPlanner, RealtimeTrip;
 import 'generated_code/journey_planner.enums.swagger.dart';
 import 'generated_code/journey_planner.swagger.dart'
@@ -38,6 +40,7 @@ import 'transit.dart'
 import 'tuple_comparing.dart';
 
 var awesomeNotifications = AwesomeNotifications();
+var workManager = Workmanager();
 var logger = Logger('main.dart');
 
 void main() async {
@@ -62,6 +65,7 @@ void main() async {
 
 Future<void> _main() async {
   initializeTimeZones();
+  await workManager.initialize(registerBackgroundTasks, isInDebugMode: true);
   await awesomeNotifications.initialize(
       // set the icon to null if you want to use the default app icon
       null,
@@ -319,8 +323,11 @@ class TripTile extends StatelessWidget {
               children: [
                 ElevatedButton(
                   onPressed: () async {
-                    await catcher('failed to show notification',
-                        () async => showNotification(stop, trip));
+                    await catcher(
+                        'failed to show notification',
+                        () => workManager.registerOneOffTask(
+                            'uniqueName', SHOW_NOTIFICATION,
+                            inputData: Job(stop, trip).toJson()));
                   },
                   child: const Text('Track'),
                 )
@@ -424,4 +431,19 @@ Future<void> showPopulatedAboutDialog(BuildContext context) async {
       context: context,
       applicationName: data.appName,
       applicationVersion: data.version + '+' + data.buildNumber);
+}
+
+void registerBackgroundTasks() {
+  workManager.executeTask((taskName, inputData) async {
+    switch (taskName) {
+      case "showNotification":
+        var job = Job.fromJson(inputData!);
+
+        await _MyHomePageState().showNotification(job.stop, job.trip);
+        break;
+      default:
+        logger.warning('No matching task for $taskName');
+    }
+    return true;
+  });
 }
