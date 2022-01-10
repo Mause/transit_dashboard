@@ -14,6 +14,7 @@ import 'package:chopper/chopper.dart'
 import 'package:intl/intl.dart';
 import 'package:logging/logging.dart' show Logger;
 import 'package:sentry/sentry.dart' show SentryHttpClient;
+import 'package:timezone/data/latest.dart' show initializeTimeZones;
 import 'package:timezone/standalone.dart' as tz;
 import 'package:transit_dashboard/errors.dart' show errorOrResult;
 import 'package:transit_dashboard/loggers.dart' show setupLogging;
@@ -28,7 +29,7 @@ var logger = Logger('transit.dart');
 var dataset = 'PerthRestricted';
 
 Future<void> main() async {
-  await tz.initializeTimeZone();
+  initializeTimeZones();
   setupLogging();
 
   var location = Location(-31.951548099520902, 115.85798556027436);
