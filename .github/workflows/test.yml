@@ -46,8 +46,7 @@ jobs:
       - name: Generate sources
         run: flutter pub run build_runner build --verbose
 
-      - name: Analyze project source
-        run: flutter analyze
+      - uses: invertase/github-action-dart-analyzer@v1
 
       - run: dart run --define=API_KEY=${{ secrets.API_KEY }} bin/transit_dashboard.dart
 
