@@ -17,10 +17,6 @@ default_platform(:android)
 
 platform :android do
   desc "Runs all the tests"
-  lane :test do
-    gradle(task: "test")
-  end
-
   lane :test do |options|
     waldo(upload_token: options[:waldo_token], apk_path: 'transit_dashboard.apk')
   end
