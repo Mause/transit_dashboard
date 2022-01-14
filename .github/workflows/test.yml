@@ -84,7 +84,7 @@ jobs:
         with:
           ruby-version: '3.1.0'
           bundler-cache: true
-      - run: bundler exec fastlane test
+      - run: bundler exec fastlane test waldo_token:${{ secrets.WALDO_TOKEN }}
 
   create_github_release:
     runs-on: ubuntu-latest
