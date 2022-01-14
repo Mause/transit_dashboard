@@ -68,7 +68,7 @@ jobs:
           name: apk
           path: '*.apk'
 
-  test:
+  fastlane:
     runs-on: ubuntu-latest
     needs: flutter
 
