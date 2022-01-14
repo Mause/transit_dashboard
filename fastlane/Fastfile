@@ -21,9 +21,12 @@ platform :android do
     gradle(task: "test")
   end
 
+  lane :test do |options|
+    waldo(upload_token: options[:waldo_token], apk_path: 'transit_dashboard.apk')
+  end
+
   desc "Submit a new Beta Build to Crashlytics Beta"
   lane :beta do
-    gradle(task: "clean assembleRelease")
     crashlytics
   
     # sh "your_script.sh"
