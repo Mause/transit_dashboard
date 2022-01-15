@@ -79,7 +79,8 @@ jobs:
       - uses: actions/download-artifact@v2
         with:
           name: apk
-          path: transit_dashboard.apk
+          path: .
+      - run: mv me.mause.transit_dashboard_${{ github.run_number }}.apk transit_dashboard.apk
       - uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.1.0'
