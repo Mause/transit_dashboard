@@ -2,4 +2,5 @@
 #
 # Ensure this file is checked in to source control!
 
-gem 'fastlane-plugin-waldo'
+gem 'fastlane-plugin-waldo', '~> 2.0', '>= 2.0.1'
+
