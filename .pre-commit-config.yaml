@@ -1,5 +1,6 @@
 ci:
   skip: [flutter-analyze, flutter-format]
+exclude: 'late.json|.devcontainer/devcontainer.json'
 repos:
   - repo: https://github.com/whtsky/pre-commit-pretty-format-json5
     rev: "1.0.0"
