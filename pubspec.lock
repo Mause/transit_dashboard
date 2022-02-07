@@ -267,7 +267,7 @@ packages:
       name: geolocator
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "8.0.5"
+    version: "8.1.1"
   geolocator_android:
     dependency: transitive
     description:
@@ -288,7 +288,7 @@ packages:
       name: geolocator_platform_interface
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "4.0.1"
+    version: "4.0.2"
   geolocator_web:
     dependency: transitive
     description:
@@ -296,6 +296,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.4"
+  geolocator_windows:
+    dependency: transitive
+    description:
+      name: geolocator_windows
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.1.0"
   get:
     dependency: "direct main"
     description:
@@ -434,7 +441,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: a52ee848ae12aa985d4e80decd022f21c47d9e32
+      resolved-ref: f6940bb198096b5901c25d4206633102af8e3d5b
       url: "https://github.com/Mause/material_you_colours"
     source: git
     version: "0.0.1"
@@ -640,21 +647,21 @@ packages:
       name: sentry
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "6.2.2"
+    version: "6.3.0"
   sentry_flutter:
     dependency: "direct main"
     description:
       name: sentry_flutter
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "6.2.2"
+    version: "6.3.0"
   sentry_logging:
     dependency: "direct main"
     description:
       name: sentry_logging
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "6.2.2"
+    version: "6.3.0"
   shelf:
     dependency: transitive
     description:
@@ -869,7 +876,7 @@ packages:
       name: win32
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.3.10"
+    version: "2.3.11"
   workmanager:
     dependency: "direct main"
     description:
@@ -883,7 +890,7 @@ packages:
       name: xdg_directories
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.2.0"
+    version: "0.2.0+1"
   yaml:
     dependency: transitive
     description:
