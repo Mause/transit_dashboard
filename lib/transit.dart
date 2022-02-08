@@ -24,6 +24,7 @@ import 'generated_code/journey_planner.swagger.dart'
 import 'generated_code/realtime_trip.swagger.dart' as rtt;
 import 'journey_planner_service.dart' show Location, nearbyStops;
 
+var checkNotNull = ArgumentError.checkNotNull;
 var json = const JsonEncoder.withIndent('  ');
 var logger = Logger('transit.dart');
 var dataset = 'PerthRestricted';
@@ -57,14 +58,18 @@ rtt.RealtimeTrip getRealtimeTripService() {
 
 Future<rtt.TripStop> getTripStop(
     rtt.RealtimeTrip tripClient, Trip trip, String? stopCode) async {
-  var realtimeTrip = (await tripClient.dataSetsDatasetTripGet(
+  var realtimeTrip = errorOrResult(await tripClient.dataSetsDatasetTripGet(
       dataset: dataset,
       isRealTimeChecked: true,
       tripUid: trip.summary!.tripUid!,
       tripDate: trip.arriveTime!,
       format: rtt.Format.json));
 
-  return realtimeTrip.body!.tripStops!
+  checkNotNull(realtimeTrip, "body");
+  checkNotNull(realtimeTrip.tripStops, "tripsStops");
+
+  return realtimeTrip.tripStops!
+      .where((element) => element.transitStop != null)
       .firstWhere((element) => element.transitStop!.code == stopCode);
 }
 
