@@ -52,6 +52,7 @@ Future<void> mockWorkManager() async {
         await bm.handlePlatformMessage(background.name,
             background.codec.encodeMethodCall(methodCall), null);
     }
+    return null;
   });
 
   bm.setMockMethodCallHandler(background, (message) async {
@@ -59,5 +60,6 @@ Future<void> mockWorkManager() async {
       case "backgroundChannelInitialized":
         break;
     }
+    return null;
   });
 }
