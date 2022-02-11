@@ -33,7 +33,7 @@ jobs:
         with:
           definition-file: ${{ matrix.definition-file }}
 
-  flutter:
+  flutter_smoke_test:
     runs-on: ubuntu-latest
     container: cirrusci/flutter:beta
 
@@ -49,6 +49,21 @@ jobs:
       - uses: invertase/github-action-dart-analyzer@v1
 
       - run: dart run --define=API_KEY=${{ secrets.API_KEY }} bin/transit_dashboard.dart
+
+  flutter:
+    runs-on: ubuntu-latest
+    container: cirrusci/flutter:beta
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Generate sources
+        run: flutter pub run build_runner build --verbose
+
+      - uses: invertase/github-action-dart-analyzer@v1
 
       - run: flutter test
 
@@ -70,7 +85,7 @@ jobs:
 
   fastlane:
     runs-on: ubuntu-latest
-    needs: flutter
+    needs: [flutter, flutter_smoke_test]
 
     steps:
       - uses: actions/checkout@v2
@@ -94,6 +109,7 @@ jobs:
     if: github.ref == 'refs/heads/main'
     needs:
       - flutter
+      - flutter_smoke_test
       - swagger_validate
     steps:
       - uses: actions/checkout@v2
