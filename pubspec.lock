@@ -434,7 +434,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "9bec0cb305124ef7f4e350627f01bf1e6cd6396f"
+      resolved-ref: a52ee848ae12aa985d4e80decd022f21c47d9e32
       url: "https://github.com/Mause/material_you_colours"
     source: git
     version: "0.0.1"
@@ -640,21 +640,21 @@ packages:
       name: sentry
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "6.2.2"
+    version: "6.3.0"
   sentry_flutter:
     dependency: "direct main"
     description:
       name: sentry_flutter
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "6.2.2"
+    version: "6.3.0"
   sentry_logging:
     dependency: "direct main"
     description:
       name: sentry_logging
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "6.2.2"
+    version: "6.3.0"
   shelf:
     dependency: transitive
     description:
@@ -893,4 +893,4 @@ packages:
     version: "3.1.0"
 sdks:
   dart: ">=2.15.0 <3.0.0"
-  flutter: ">=2.5.0"
+  flutter: ">=2.10.0-0.3.pre"
