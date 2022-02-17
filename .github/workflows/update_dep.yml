@@ -2,9 +2,10 @@ on:
   workflow_dispatch:
     inputs:
       dependency:
+        required: true
         type: string
 
-name: Update ${{ github.event.inputs.dependency }}
+name: Update single dependency
 jobs:
   update:
     name: Update flutter dependency
