@@ -24,8 +24,7 @@ jobs:
           channel: beta
       - uses: technote-space/create-pr-action@v2
         with:
-          EXECUTE_COMMANDS: |
-            flutter pub upgrade ${{ github.event.inputs.dependency }} --major-versions
+          EXECUTE_COMMANDS: flutter pub upgrade ${{ github.event.inputs.dependency }}
           COMMIT_MESSAGE: "chore: update ${{ github.event.inputs.dependency }}"
           COMMIT_NAME: "GitHub Actions"
           COMMIT_EMAIL: "example@example.com"
