@@ -13,6 +13,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+        with:
+          persist-credentials: false
       - name: Cache Flutter dependencies
         uses: actions/cache@v2
         with:
@@ -30,4 +32,5 @@ jobs:
           COMMIT_EMAIL: "example@example.com"
           PR_BRANCH_NAME: "update-${{ github.event.inputs.dependency }}"
           PR_TITLE: "chore: update ${{ github.event.inputs.dependency }}"
+          PR_BODY: https://pub.dev/packages/${{ github.event.inputs.dependency }}/changelog
           GITHUB_TOKEN: ${{ secrets.ACCESS_TOKEN }}
