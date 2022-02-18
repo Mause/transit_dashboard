@@ -71,7 +71,7 @@ dev_dependencies:
   build_runner: 2.1.7
   json_serializable: ^6.1.4
   test: '>=1.15.0 <2.0.0'
-  chopper_generator: 4.0.3
+  chopper_generator: ^4.0.5
   swagger_dart_code_generator: ^2.3.8
   nock: ^1.2.0
 
