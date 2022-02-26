@@ -50,7 +50,11 @@ jobs:
 
       - uses: invertase/github-action-dart-analyzer@v1
 
-      - run: dart run --define=API_KEY=${{ secrets.API_KEY }} bin/transit_dashboard.dart
+      - run: |
+          dart run \
+            --define=REALTIME_API_KEY=${{ secrets.REALTIME_API_KEY }} \
+            --define=API_KEY=${{ secrets.API_KEY }} \
+            bin/transit_dashboard.dart
 
   flutter:
     runs-on: ubuntu-latest
