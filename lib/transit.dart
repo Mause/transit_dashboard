@@ -53,7 +53,7 @@ rtt.RealtimeTrip getRealtimeTripService() {
   return getClient(
       rtt.RealtimeTrip.create,
       "http://realtime.transperth.info/SJP/TripService.svc/",
-      "ad89905f-d5a7-487f-a876-db39092c6ee0");
+      const String.fromEnvironment("REALTIME_API_KEY"));
 }
 
 Future<rtt.TripStop> getTripStop(
