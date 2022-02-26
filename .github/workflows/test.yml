@@ -16,6 +16,8 @@ jobs:
           pip install pipenv
           pipenv install
       - run: pipenv run python main.py
+        env:
+          REALTIME_API_KEY: ${{ secrets.REALTIME_API_KEY }}
 
   swagger_validate:
     runs-on: ubuntu-latest
@@ -69,6 +71,7 @@ jobs:
 
       - run: |
           flutter build apk \
+            --dart-define=REALTIME_API_KEY=${{ secrets.REALTIME_API_KEY }} \
             --dart-define=API_KEY=${{ secrets.API_KEY }} \
             --dart-define=SENTRY_DSN=${{ secrets.SENTRY_DSN }} \
             --build-number ${{ github.run_number }}
