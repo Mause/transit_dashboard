@@ -134,3 +134,4 @@ lib/generated_code
 .idea
 .flutter-plugins
 .flutter-plugins-dependencies
+node_modules
