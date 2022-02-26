@@ -1,4 +1,5 @@
 import requests
+from os import environ
 from datetime import datetime
 from dateutil.parser import parse as _parse
 from dateutil.tz import gettz
@@ -8,9 +9,7 @@ from pprint import pprint
 perth = gettz("Australia/Perth")
 
 session = requests.Session()
-session.params.update(
-    {"format": "json", "ApiKey": "ad89905f-d5a7-487f-a876-db39092c6ee0"}
-)
+session.params.update({"format": "json", "ApiKey": environ["REALTIME_API_KEY"]})
 
 
 def parse(string: str) -> datetime:
