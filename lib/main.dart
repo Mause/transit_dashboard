@@ -64,6 +64,7 @@ void main() async {
 }
 
 Future<void> _main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   initializeTimeZones();
   await workManager.initialize(registerBackgroundTasks, isInDebugMode: true);
   await awesomeNotifications.initialize(
