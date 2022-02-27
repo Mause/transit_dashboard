@@ -7,6 +7,8 @@ import 'package:awesome_notifications/awesome_notifications.dart'
         NotificationContent,
         NotificationLayout;
 import 'package:duration/duration.dart' show prettyDuration;
+import 'package:dynamic_color/dynamic_color.dart'
+    show DynamicColorBuilder, ColorSchemeHarmonization;
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart'
     show GeolocatorPlatform, LocationPermission, LocationSettings;
@@ -14,8 +16,6 @@ import 'package:get/get.dart' show Get, GetMaterialApp, ExtensionSnackbar;
 import 'package:intl/date_symbol_data_local.dart' show initializeDateFormatting;
 import 'package:intl/intl.dart' show DateFormat, Intl;
 import 'package:logging/logging.dart' show Level, Logger;
-import 'package:material_you_colours/material_you_colours.dart'
-    show getMaterialYouThemeData;
 import 'package:ordered_set/comparing.dart' show Comparing;
 import 'package:ordered_set/ordered_set.dart' show OrderedSet;
 import 'package:package_info_plus/package_info_plus.dart' show PackageInfo;
@@ -94,17 +94,23 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-        future: getMaterialYouThemeData(),
-        builder: (BuildContext context, AsyncSnapshot<ThemeData?> theme) =>
-            GetMaterialApp(
-              navigatorObservers: [
-                SentryNavigatorObserver(),
-              ],
-              title: 'Transit Dashboard',
-              theme: theme.data ?? ThemeData.fallback(),
-              home: const MyHomePage(title: 'Transit Dashboard'),
-            ));
+    return DynamicColorBuilder(builder: (light, dark) {
+      var theme =
+          WidgetsBinding.instance?.window.platformBrightness == Brightness.dark
+              ? dark
+              : light;
+
+      return GetMaterialApp(
+        navigatorObservers: [
+          SentryNavigatorObserver(),
+        ],
+        title: 'Transit Dashboard',
+        theme: theme == null
+            ? ThemeData.fallback()
+            : ThemeData(useMaterial3: true, colorScheme: theme.harmonized()),
+        home: const MyHomePage(title: 'Transit Dashboard'),
+      );
+    });
   }
 }
 
