@@ -369,6 +369,8 @@ getIconColor(TripSummary summary) {
         return Colors.blue;
       case "black":
         return Colors.black;
+      case "purple":
+        return Colors.deepPurple;
       case "red":
         return Colors.red;
     }
