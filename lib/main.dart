@@ -277,8 +277,12 @@ class _MyHomePageState extends State<MyHomePage> {
             'Realtime information is not available. Using scheduled time.');
       } else {
         var howLate = scheduled.difference(realtime);
-        content
-            .add('Running ${prettyDuration(howLate, conjunction: ', ')} late.');
+        content.add('Running ' +
+            (howLate.isNegative
+                ? '${prettyDuration(-howLate, conjunction: ', ')} early.'
+                : howLate == Duration.zero
+                    ? 'exactly on time'
+                    : '${prettyDuration(howLate, conjunction: ', ')} late.'));
       }
 
       await update(routeNumber!, content);
