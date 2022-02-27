@@ -250,53 +250,51 @@ class _MyHomePageState extends State<MyHomePage> {
           .expand((e) => e.trips!.map((trip) => Tuple2(e.transitStop!, trip))));
     });
   }
+}
 
-  Future<void> showNotification(Stop transitStop, Trip scheduledTrip) async {
-    if (scheduledTrip.arriveTime == null) {
-      throw Exception(
-          'missing arrive time on ${scheduledTrip.summary!.makeSummary()}');
-    }
-
-    setState(() {
-      stopNumber = transitStop.code! + " " + transitStop.description!;
-      routeNumber = scheduledTrip.summary!.makeSummary();
-    });
-
-    while (true) {
-      var perth = getLocation('Australia/Perth');
-      var now = getNow();
-
-      var content = <String>[];
-
-      var trip = await getTripStop(
-          realtimeTripService, scheduledTrip, transitStop.code);
-
-      var realtime = getRealtime(now, trip.realTimeInfo);
-      var scheduled = TZDateTime.from(trip.arrivalTime!, perth);
-      var datetime = realtime ?? scheduled;
-
-      var delta = datetime.difference(now);
-      if (delta < Duration.zero) break;
-
-      content.add(prettyDuration(delta, conjunction: ', ') + ' away.');
-      if (realtime == null) {
-        content.add(
-            'Realtime information is not available. Using scheduled time.');
-      } else {
-        var howLate = scheduled.difference(realtime);
-        content.add('Running ' +
-            (howLate.isNegative
-                ? '${prettyDuration(-howLate, conjunction: ', ')} early.'
-                : howLate == Duration.zero
-                    ? 'exactly on time'
-                    : '${prettyDuration(howLate, conjunction: ', ')} late.'));
-      }
-
-      await update(routeNumber!, content);
-      await Future.delayed(const Duration(seconds: 3));
-    }
-    await update(routeNumber!, ['Departed']);
+Future<void> showNotification(Stop transitStop, Trip scheduledTrip) async {
+  if (scheduledTrip.arriveTime == null) {
+    throw Exception(
+        'missing arrive time on ${scheduledTrip.summary!.makeSummary()}');
   }
+
+  var realtimeTripService = getRealtimeTripService();
+  var routeNumber = scheduledTrip.summary!.makeSummary();
+
+  while (true) {
+    var perth = getLocation('Australia/Perth');
+    var now = getNow();
+
+    var content = <String>[];
+
+    var trip =
+        await getTripStop(realtimeTripService, scheduledTrip, transitStop.code);
+
+    var realtime = getRealtime(now, trip.realTimeInfo);
+    var scheduled = TZDateTime.from(trip.arrivalTime!, perth);
+    var datetime = realtime ?? scheduled;
+
+    var delta = datetime.difference(now);
+    if (delta < Duration.zero) break;
+
+    content.add(prettyDuration(delta, conjunction: ', ') + ' away.');
+    if (realtime == null) {
+      content
+          .add('Realtime information is not available. Using scheduled time.');
+    } else {
+      var howLate = scheduled.difference(realtime);
+      content.add('Running ' +
+          (howLate.isNegative
+              ? '${prettyDuration(-howLate, conjunction: ', ')} early.'
+              : howLate == Duration.zero
+                  ? 'exactly on time'
+                  : '${prettyDuration(howLate, conjunction: ', ')} late.'));
+    }
+
+    await update(routeNumber, content);
+    await Future.delayed(const Duration(seconds: 3));
+  }
+  await update(routeNumber, ['Departed']);
 }
 
 class TripTile extends StatelessWidget {
@@ -447,12 +445,14 @@ Future<void> showPopulatedAboutDialog(BuildContext context) async {
 }
 
 void registerBackgroundTasks() {
+  initializeTimeZones();
+
   workManager.executeTask((taskName, inputData) async {
     switch (taskName) {
       case "showNotification":
         var job = Job.fromJson(inputData!);
 
-        await _MyHomePageState().showNotification(job.stop, job.trip);
+        await showNotification(job.stop, job.trip);
         break;
       default:
         logger.warning('No matching task for $taskName');
