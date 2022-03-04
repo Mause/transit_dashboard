@@ -45,6 +45,8 @@ jobs:
         with:
           channel: beta
 
+      - run: flutter update-packages --force-upgrade
+
       - name: Install dependencies
         run: flutter pub get
 
@@ -68,6 +70,8 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: beta
+
+      - run: flutter update-packages --force-upgrade
 
       - name: Install dependencies
         run: flutter pub get
