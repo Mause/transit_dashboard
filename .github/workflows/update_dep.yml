@@ -12,14 +12,14 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v2
-        with:
-          persist-credentials: false
-      - name: Cache Flutter dependencies
-        uses: actions/cache@v2
-        with:
-          path: /opt/hostedtoolcache/flutter
-          key: ${{ runner.OS }}-flutter-install-cache-${{ env.flutter_version }}-${{ hashFiles('pubspec.lock') }}
+#       - uses: actions/checkout@v2
+#         with:
+#           persist-credentials: false
+#       - name: Cache Flutter dependencies
+#         uses: actions/cache@v2
+#         with:
+#           path: /opt/hostedtoolcache/flutter
+#           key: ${{ runner.OS }}-flutter-install-cache-${{ env.flutter_version }}-${{ hashFiles('pubspec.lock') }}
 
       - uses: subosito/flutter-action@v2
         with:
