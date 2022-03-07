@@ -37,10 +37,15 @@ jobs:
 
   flutter_smoke_test:
     runs-on: ubuntu-latest
-    container: cirrusci/flutter:beta
 
     steps:
       - uses: actions/checkout@v2
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: beta
+
+      - run: flutter update-packages --force-upgrade
 
       - name: Install dependencies
         run: flutter pub get
@@ -58,10 +63,15 @@ jobs:
 
   flutter:
     runs-on: ubuntu-latest
-    container: cirrusci/flutter:beta
 
     steps:
       - uses: actions/checkout@v2
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: beta
+
+      - run: flutter update-packages --force-upgrade
 
       - name: Install dependencies
         run: flutter pub get
