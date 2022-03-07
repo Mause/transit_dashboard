@@ -24,6 +24,9 @@ jobs:
       - uses: subosito/flutter-action@v2
         with:
           channel: beta
+
+      - run: flutter update-packages --force-upgrade
+
       - uses: technote-space/create-pr-action@v2
         with:
           EXECUTE_COMMANDS: flutter pub upgrade ${{ github.event.inputs.dependency }}
