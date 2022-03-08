@@ -12,7 +12,7 @@ repos:
       - id: check-json
       - id: check-toml
       - id: check-yaml
-  - repo: https://github.com/humitos/mirrors-autoflake
+  - repo: https://github.com/PyCQA/autoflake
     rev: v1.3
     hooks:
       - id: autoflake
