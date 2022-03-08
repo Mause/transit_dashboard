@@ -874,7 +874,7 @@ packages:
       name: win32
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "2.3.10"
+    version: "2.4.1"
   workmanager:
     dependency: "direct main"
     description:
