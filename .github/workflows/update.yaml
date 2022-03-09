@@ -23,8 +23,8 @@ jobs:
 
       - run: flutter update-packages --force-upgrade
 
-      - name: Install dependencies
-        run: flutter pub get
+#       - name: Install dependencies
+#         run: flutter pub get
 
       - name: Update openapi swagger
         uses: technote-space/create-pr-action@v2
