@@ -210,7 +210,7 @@ packages:
       name: fake_async
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.2.0"
+    version: "1.3.0"
   ffi:
     dependency: transitive
     description:
@@ -769,7 +769,7 @@ packages:
       name: test
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.20.1"
+    version: "1.20.2"
   test_api:
     dependency: transitive
     description:
