@@ -638,21 +638,21 @@ packages:
       name: sentry
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "6.3.0"
+    version: "6.4.0"
   sentry_flutter:
     dependency: "direct main"
     description:
       name: sentry_flutter
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "6.3.0"
+    version: "6.4.0"
   sentry_logging:
     dependency: "direct main"
     description:
       name: sentry_logging
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "6.3.0"
+    version: "6.4.0"
   shelf:
     dependency: transitive
     description:
@@ -839,7 +839,7 @@ packages:
       name: vm_service
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "8.2.1"
+    version: "8.2.2"
   watcher:
     dependency: transitive
     description:
