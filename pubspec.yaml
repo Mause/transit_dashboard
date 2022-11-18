@@ -44,7 +44,7 @@ dependencies:
   geolocator: ^8.0.1
   get: ^4.6.1
   awesome_notifications: ^0.6.19
-  sentry_flutter: ^6.2.2
+  sentry_flutter: ^6.16.0
   sentry_logging: ^6.2.2
   duration: ^3.0.8
   ordered_set: ^5.0.0
